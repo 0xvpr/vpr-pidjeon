@@ -21,8 +21,8 @@ INCLUDES=$(addprefix -I, $(INCLUDE))
 all: $(TARGET)
 
 $(TARGET): $(32OBJ) $(32OBJS) $(64OBJ) $(64OBJS) $(OBJ) $(BIN)
-	$(LD) $(32OBJS) $(LDFLAGS) -o $(BIN)/$(TARGET)x86
-	$(LD) $(64OBJS) $(LDFLAGS) -o $(BIN)/$(TARGET)x64
+	$(LD) $(32OBJS) $(LDFLAGS) -o $(BIN)/$(TARGET)_x86
+	$(LD) $(64OBJS) $(LDFLAGS) -o $(BIN)/$(TARGET)_x64
 
 $(32OBJS): $(32OBJ)/%.o : $(SRC)/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $^ -o $@

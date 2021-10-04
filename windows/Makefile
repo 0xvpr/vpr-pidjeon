@@ -45,5 +45,5 @@ $(BIN):
 	mkdir -p $@
 
 clean:
-	rm -fr $(OBJ)
-	rm -fr $(BIN)/*.exe
+	rm -fr $(OBJ)/*
+	rm -fr $(BIN)/$(TARGET)*

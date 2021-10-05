@@ -1,9 +1,9 @@
 TARGET=payload_injector
 
-CC=gcc
+CC=clang
 LD=gcc
-CFLAGS=-std=c99 -Wall -Wextra -O2 -s -DRELEASE
-LDFLAGS=
+CFLAGS=-std=gnu99 -s -O2 -Wall -Wextra -DRELEASE
+LDFLAGS=-ldl
 
 BIN=bin
 
@@ -11,14 +11,17 @@ SRC=src
 OBJ=build
 32OBJ=$(OBJ)/x86
 64OBJ=$(OBJ)/x64
-SRCS=$(wildcard $(SRC)/*.c)
+SRCS=$(addprefix $(SRC)/, utils.c ptrace.c inject-x86_64.c)
 32OBJS=$(patsubst $(SRC)/%.c, $(32OBJ)/%.o, $(SRCS))
 64OBJS=$(patsubst $(SRC)/%.c, $(64OBJ)/%.o, $(SRCS))
 
 INCLUDE=include
 INCLUDES=$(addprefix -I, $(INCLUDE))
 
-all: $(TARGET)
+all: test
+
+test:
+	$(CC) $(SRCS) $(INCLUDES) $(LDFLAGS) -o $(TARGET)
 
 $(TARGET): $(32OBJ) $(32OBJS) $(64OBJ) $(64OBJS) $(OBJ) $(BIN)
 	$(LD) $(32OBJS) $(LDFLAGS) -o $(BIN)/$(TARGET)_x86

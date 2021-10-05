@@ -3,5 +3,16 @@
 *.o
 *.so
 *.obj
+*.out
+*.exe
 *.dll
 *.lib
+
+# Exclude directories
+.vs/
+bin/
+out/
+build/
+
+# Exclude configuration files
+compile_flags.txt

@@ -54,6 +54,10 @@ int ParseCommandLine(int argc, char** argv, unsigned* time_ms)
         }
         i--;
     }
+    if (!operation)
+    {
+        operation = INJECT_LOAD_LIBRARY_A;
+    }
 
     return operation;
 }

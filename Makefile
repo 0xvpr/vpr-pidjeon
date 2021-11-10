@@ -1,7 +1,7 @@
 PROJECT = payload_injector
 
 CC      = gcc
-CFLAGS  = -std=c99 -Wall -Wextra -O2 -s -DRELEASE
+CFLAGS  = -std=c99 -s -O2 -Wall -Wextra -DRELEASE
 CC32    = $(addprefix i686-w64-mingw32-, $(CC))
 CC64    = $(addprefix x86_64-w64-mingw32-, $(CC))
 
@@ -70,6 +70,6 @@ clean:
 	rm -fr log.txt
 
 clean_test:
-	rm -fr $(TEST_TARGET).exe
 	rm -fr $(OBJ)/*
+	rm -fr $(TEST_TARGET).exe
 	rm -fr log.txt

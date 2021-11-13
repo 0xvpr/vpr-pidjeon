@@ -53,7 +53,7 @@ all: release
 release: $(PROJECT)
 tests: $(PROJECT) $(TEST_TARGET)
 
-$(PROJECT): $(32OBJ) $(32OBJS) $(64OBJ) $(64OBJS) $(OBJ) $(BIN)
+$(PROJECT): $(32OBJ) $(32OBJS) $(64OBJ) $(64OBJS) $(BIN) $(OBJ)
 	$(LD32) $(32OBJS) $(LDFLAGS) -o $(BIN)/$(PROJECT)_x86.exe
 	$(LD64) $(64OBJS) $(LDFLAGS) -o $(BIN)/$(PROJECT)_x64.exe
 
@@ -63,7 +63,7 @@ $(32OBJS): $(32OBJ)/%.o : $(SRC)/%.c
 $(64OBJS): $(64OBJ)/%.o : $(SRC)/%.c
 	$(CC64) $(CFLAGS) $(INCLUDE) -c $^ -o $@
 
-$(TEST_TARGET): $(BIN) $(OBJ) $(DUMMY_TARGET) $(PAYLOAD_TARGET)
+$(TEST_TARGET): $(DUMMY_TARGET) $(PAYLOAD_TARGET) $(BIN) $(OBJ)
 	$(CC64) $(TEST_CFLAGS) $(TEST_INCLUDES) $(TESTS) $(TEST_LDFLAGS) -o $(TEST_TARGET).exe
 	./run_tests.exe
 

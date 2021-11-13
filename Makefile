@@ -27,18 +27,15 @@ SOURCES = $(wildcard $(SRC)/*.c)
 64OBJS  = $(patsubst $(SRC)/%.c, $(64OBJ)/%.o, $(SOURCES))
 
 TEST_TARGET   = run_tests
-
 TEST          = tests
 TESTS         = $(wildcard $(TEST)/*.c) $(filter-out %main.c,$(SOURCES))
 TEST_OBJS     = $(patsubst $(TEST)/%.c, $(OBJ)/%.o, $(TESTS))
-
 TEST_LIBDIR   = /usr/CUnit/lib
 TEST_INCLUDE  = /usr/CUnit/include include
 TEST_LIB      = cunit
 TEST_LIBDIRS  = $(addprefix -L, $(TEST_LIBDIR))
 TEST_INCLUDES = $(addprefix -I, $(TEST_INCLUDE))
 TEST_LIBS     = $(addprefix -l, $(TEST_LIB))
-
 TEST_CFLAGS   = $(CFLAGS)
 TEST_LDFLAGS  = $(TEST_LIBDIRS) $(TEST_LIBS) -static
 
@@ -54,7 +51,7 @@ PAYLOAD        = $(TEST)/$(PAYLOAD_TARGET).cpp
 
 all: release
 release: $(PROJECT)
-tests: $(PROJECT) $(DUMMY_TARGET) $(PAYLOAD_TARGET) $(TEST_TARGET)
+tests: $(PROJECT) $(TEST_TARGET)
 
 $(PROJECT): $(32OBJ) $(32OBJS) $(64OBJ) $(64OBJS) $(OBJ) $(BIN)
 	$(LD32) $(32OBJS) $(LDFLAGS) -o $(BIN)/$(PROJECT)_x86.exe
@@ -66,14 +63,9 @@ $(32OBJS): $(32OBJ)/%.o : $(SRC)/%.c
 $(64OBJS): $(64OBJ)/%.o : $(SRC)/%.c
 	$(CC64) $(CFLAGS) $(INCLUDE) -c $^ -o $@
 
-$(32OBJ):
-	mkdir -p $@
-
-$(64OBJ):
-	mkdir -p $@
-
-$(BIN):
-	mkdir -p $@
+$(TEST_TARGET): $(BIN) $(OBJ) $(DUMMY_TARGET) $(PAYLOAD_TARGET)
+	$(CC64) $(TEST_CFLAGS) $(TEST_INCLUDES) $(TESTS) $(TEST_LDFLAGS) -o $(TEST_TARGET).exe
+	./run_tests.exe
 
 $(DUMMY_TARGET): $(32DUMMY_OBJ) $(64DUMMY_OBJ)
 	$(CXX32) $(CXXFLAGS) $(32DUMMY_OBJ) -o $(BIN)/$(DUMMY_TARGET)_x86.exe
@@ -95,9 +87,14 @@ $(32PAYLOAD_OBJ): $(32OBJ)
 $(64PAYLOAD_OBJ): $(64OBJ)
 	$(CXX64) $(CXXFLAGS) -c $(PAYLOAD) -o $(64PAYLOAD_OBJ)
 
-$(TEST_TARGET): $(BIN) $(OBJ)
-	$(CC64) $(TEST_CFLAGS) $(TEST_INCLUDES) $(TESTS) $(TEST_LDFLAGS) -o $(TEST_TARGET).exe
-	./run_tests.exe
+$(32OBJ):
+	mkdir -p $@
+
+$(64OBJ):
+	mkdir -p $@
+
+$(BIN):
+	mkdir -p $@
 
 clean:
 	rm -fr $(OBJ)/*

@@ -9,11 +9,15 @@
 *.lib
 
 # Exclude directories
-.vs/
-bin/
-out/
-build/
+.vs
+bin
+out
+build
+
+# Exclude log files
+log.txt
+temp.txt
+CUnit_log.txt
 
 # Exclude configuration files
 compile_flags.txt
-log.txt

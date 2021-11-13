@@ -2,7 +2,7 @@
 
 **This payload injector is intended to be used in a WSL/MSYS environment.**
 
-### Supports:
+### Features
 - [x] DLL injection
 - [ ] Remote thread injection
 - [ ] TBD
@@ -14,7 +14,7 @@
 
 ### Building (MinGW)
 ```
-make
+make # makes release binaries
 ```
 
 ### Contributing
@@ -23,12 +23,13 @@ that every commit doesn't suck ass. If you plan on contributing,
 we recommend that you install CUnit through the MSYS package  
 manager and compile the program through MinGW.
 ```
-make tests
+make tests -j $(nproc) # -j recommended for build time
 ```
 
 ### TODO
-- [x] SWITCH: -o --output -> specify log file location
+- [x] SWITCH: -o --output \<path/to/output\> -\> specify log file location
 - [ ] SWITCH: -r --remote -> specify remote thread routine
+  - [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave address
 - [ ] SWITCH: -s --silent -> disable logging
 - [ ] SWITCH: -S --stealth -> specify stealth level
 - [ ] SWITCH: -v -> specify verbosity level

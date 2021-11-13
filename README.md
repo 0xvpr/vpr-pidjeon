@@ -17,6 +17,15 @@
 make
 ```
 
+### Contributing
+We are using the CUnit Testing Suite in order to make sure  
+that every commit doesn't suck ass. If you plan on contributing,  
+we recommend that you install CUnit through the MSYS package manager  
+and compile the program through MinGW.
+```
+make tests
+```
+
 ### TODO
 - [x] SWITCH: -o --output -> specify log file location
 - [ ] SWITCH: -r --remote -> specify remote thread routine

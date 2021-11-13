@@ -2,7 +2,7 @@
   #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "injector.h"
+#include "definitions.h"
 #include "parser.h"
 #include "util.h"
 #include <windows.h>
@@ -142,5 +142,5 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
         i--;
     }
 
-    return (*operation == 0 ? (pInjector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
+    return (*operation == NO_OPERATION ? (pInjector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
 }

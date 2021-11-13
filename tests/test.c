@@ -1,9 +1,11 @@
 #include "CUnit/Basic.h"
+#include "definitions.h"
 #include "injector.h"
 #include "parser.h"
-#include "data.h"
+#include "logger.h"
 
-/* Pointer to the file used by the tests. */
+#define TEST_FILE "test_log.txt"
+
 static FILE* temp_file = NULL;
 
 /* The suite initialization function.
@@ -12,7 +14,7 @@ static FILE* temp_file = NULL;
  */
 int init_suite(void)
 {
-    if (NULL == (temp_file = fopen("log.txt", "w+")))
+    if (NULL == (temp_file = fopen("CUnit_log.txt", "w")))
     {
         return -1;
     }
@@ -55,6 +57,16 @@ void testParseCommandLine_SpecifyLoadLibraryA(void)
     CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &injector, &data));
 }
 
+void testParseCommandLine_SpecifyLoadLibraryW(void)
+{
+    int argc = 5;
+    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryW" };
+    Injector injector = { .output_file = "log.txt" };
+    InjectData data = { 0 };
+
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_W, ParseCommandLine(argc, argv, &injector, &data));
+}
+
 void testParseCommandLine_SpecifyManualMap(void)
 {
     int argc = 5;
@@ -63,6 +75,37 @@ void testParseCommandLine_SpecifyManualMap(void)
     InjectData data = { 0 };
 
     CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &injector, &data));
+}
+
+void testLogEvent_CreateLogFile(void)
+{
+    int bytesWritten = 0;
+    Injector injector = { .output_file = TEST_FILE };
+
+    FILE* fp = NULL;
+    if ((fp = fopen(TEST_FILE, "r")))
+    {
+        fclose(fp);
+        remove(TEST_FILE);
+    }
+
+    bytesWritten = LogEvent(&injector,
+                            "Test of LogEvent's create log file",
+                            0);
+
+    CU_ASSERT_TRUE(bytesWritten == 100);
+}
+
+void testLogEvent_AppendToLogFile(void)
+{
+    int bytesWritten = 0;
+    Injector injector = { .output_file = TEST_FILE };
+
+    bytesWritten = LogEvent(&injector,
+                            "Test of LogEvent's append to log file",
+                            0);
+
+    CU_ASSERT_TRUE(bytesWritten == 62);
 }
 
 /**
@@ -92,7 +135,9 @@ int main(void)
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
     if ( NULL == CU_add_test(pSuite, "test of Unspecified Injector -> LoadLibraryA", testParseCommandLine_UnspecifiedInjector) ||
          NULL == CU_add_test(pSuite, "test of Specified Injector -> LoadLibraryA", testParseCommandLine_SpecifyLoadLibraryA) ||
-         NULL == CU_add_test(pSuite, "test of Specified Injector -> ManualMap", testParseCommandLine_SpecifyManualMap) )
+         NULL == CU_add_test(pSuite, "test of Specified Injector -> ManualMap", testParseCommandLine_SpecifyManualMap) ||
+         NULL == CU_add_test(pSuite, "test of LogEvent -> Create log file", testLogEvent_CreateLogFile) ||
+         NULL == CU_add_test(pSuite, "test of LogEvent -> Append to log file", testLogEvent_AppendToLogFile) )
     {
         CU_cleanup_registry();
         return CU_get_error();

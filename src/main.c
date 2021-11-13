@@ -1,16 +1,13 @@
 /**
  * Author:   VPR
  * Created:  September 14, 2021
- * Modified: September 17, 2021
+ * Modified: November 12, 2021
 **/
 
-#include "manualmap.h"
+#include "definitions.h"
 #include "injector.h"
 #include "parser.h"
-#include "data.h"
 #include <stdio.h>
-
-#define DEBUG
 
 int main(int argc, char* argv[])
 {
@@ -25,11 +22,11 @@ int main(int argc, char* argv[])
                           .output_file = "log.txt" };
 
     if (ParseCommandLine(argc, argv, &injector, &data) == -1)
-    { 
+    {
         return -1;
     }
 
     InjectPayload(&data, &injector);
 
-    return injector.status;
+    return 0;
 }

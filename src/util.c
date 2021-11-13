@@ -1,6 +1,7 @@
+#include "definitions.h"
 #include "util.h"
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void __usage_error(const char* msg, char* argv_0)
 {
@@ -27,4 +28,36 @@ void __usage_error(const char* msg, char* argv_0)
     );
 
     exit(1);
+}
+
+void __handle_error(int inject_code)
+{
+    switch (inject_code)
+    {
+        case INCORRECT_PARAMETERS:
+            fprintf(stdout, "Error code %d: Incorrect Paramters.\n", INCORRECT_PARAMETERS);
+            break;
+        case PROCESS_NOT_RUNNING:
+            fprintf(stdout, "Error code %d: Process is not running.\n", PROCESS_NOT_RUNNING);
+            break;
+        case DLL_DOES_NOT_EXIST:
+            fprintf(stdout, "Error code %d: DLL does not exist.\n", DLL_DOES_NOT_EXIST);
+            break;
+        case INJECTION_FAILED:
+            fprintf(stdout, "Error code %d: Injection Failed.\n", DLL_DOES_NOT_EXIST);
+            break;
+        default:
+            break;
+    }
+}
+
+bool DllPathIsValid(TCHAR full_path[260])
+{
+    FILE* fp;
+    if (fopen_s(&fp, TEXT(full_path), "r"))
+        fclose(fp);
+    else
+        return false;
+
+    return true;
 }

@@ -1,5 +1,7 @@
 #include "CUnit/Basic.h"
+#include "injector.h"
 #include "parser.h"
+#include "data.h"
 
 /* Pointer to the file used by the tests. */
 static FILE* temp_file = NULL;
@@ -33,31 +35,34 @@ int clean_suite(void)
   return 0;
 }
 
-void testParseCommandLine_DefaultInjector(void)
+void testParseCommandLine_UnspecifiedInjector(void)
 {
     int argc = 3;
     char* argv[3] = { "injector.exe", "target.exe", "payload.dll" };
-    unsigned time_ms = 0;
+    Injector injector = { .output_file = "log.txt" };
+    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &time_ms));
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &injector, &data));
 }
 
 void testParseCommandLine_SpecifyLoadLibraryA(void)
 {
     int argc = 5;
     char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryA" };
-    unsigned time_ms = 0;
+    Injector injector = { .output_file = "log.txt" };
+    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &time_ms));
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &injector, &data));
 }
 
 void testParseCommandLine_SpecifyManualMap(void)
 {
     int argc = 5;
     char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "ManualMap" };
-    unsigned time_ms = 0;
+    Injector injector = { .output_file = "log.txt" };
+    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &time_ms));
+    CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &injector, &data));
 }
 
 /**
@@ -85,7 +90,7 @@ int main(void)
 
     /* add the tests to the suite */
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if ( NULL == CU_add_test(pSuite, "test of Default Injector", testParseCommandLine_DefaultInjector) ||
+    if ( NULL == CU_add_test(pSuite, "test of Unspecified Injector -> LoadLibraryA", testParseCommandLine_UnspecifiedInjector) ||
          NULL == CU_add_test(pSuite, "test of Specified Injector -> LoadLibraryA", testParseCommandLine_SpecifyLoadLibraryA) ||
          NULL == CU_add_test(pSuite, "test of Specified Injector -> ManualMap", testParseCommandLine_SpecifyManualMap) )
     {

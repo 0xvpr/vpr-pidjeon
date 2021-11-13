@@ -14,6 +14,18 @@
 #include <tlhelp32.h>
 #include <stdbool.h>
 
+typedef struct _Injector
+{
+    int      status;
+    int      operation;
+    unsigned delay_ms;
+    int      remote:1;
+    int      silent:1;
+    int      stealth:1;
+    int      verbosity:2;
+    char     output_file[256];
+} Injector;
+
 DWORD GetProcessIdByProcessName(const char* process_name);
 
 bool DllPathIsValid(TCHAR full_path[260]);

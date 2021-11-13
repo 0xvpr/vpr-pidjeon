@@ -18,5 +18,8 @@ make
 ```
 
 ### TODO
-- [ ] SWITCH: -o --output -> specify log file location
+- [x] SWITCH: -o --output -> specify log file location
 - [ ] SWITCH: -r --remote -> specify remote thread routine
+- [ ] SWITCH: -s --silent -> disable logging
+- [ ] SWITCH: -S --stealth -> specify stealth level
+- [ ] SWITCH: -v -> specify verbosity level

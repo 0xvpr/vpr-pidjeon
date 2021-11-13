@@ -16,3 +16,4 @@ build/
 
 # Exclude configuration files
 compile_flags.txt
+log.txt

@@ -2,18 +2,27 @@
   #define WIN32_LEAN_AND_MEAN
 #endif
 
+#include "injector.h"
 #include "parser.h"
 #include "util.h"
 #include <windows.h>
 #include <stdio.h>
 
-int ParseCommandLine(int argc, char** argv, unsigned* time_ms)
+int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pData)
 {
-    int operation = 0;
-    int i = argc-1;
+    int* operation = &(pInjector->operation);
+    int i = argc - 1;
 
     if (argc < 3)
+    {
         __usage_error("Missing positional arguments", argv[0]);
+        return -1;
+    }
+    else
+    {
+        strncpy_s(pData->target_process, MAX_PATH, argv[1], MAX_PATH);
+        strncpy_s(pData->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
+    }
 
     while (i > 2)
     {
@@ -24,12 +33,20 @@ int ParseCommandLine(int argc, char** argv, unsigned* time_ms)
                 case 'd':
                 {
                     if (i < argc - 1)
-                        sscanf(argv[i+1], "%d", time_ms);
+                    {
+                        sscanf(argv[i+1], "%u", &(pInjector->delay_ms));
+                    }
                     else
+                    {
                         __usage_error("-d switch used incorrectly", argv[0]);
+                        return -1;
+                    }
 
-                    if (!time_ms)
+                    if (!pInjector->delay_ms)
+                    {
                         __usage_error("-d switch used incorrectly", argv[0]);
+                        return -1;
+                    }
 
                     break;
                 }
@@ -37,27 +54,93 @@ int ParseCommandLine(int argc, char** argv, unsigned* time_ms)
                 {
                     char arg_to_parse[32] = { 0 };
                     if (i < argc - 1)
+                    {
                         strncpy_s(arg_to_parse, sizeof(arg_to_parse), argv[i+1], sizeof(arg_to_parse));
+                    }
                     
                     if (!strncmp(arg_to_parse, "LoadLibraryA", strlen("LoadLibraryA")))
-                        operation |= INJECT_LOAD_LIBRARY_A;
+                    {
+                        *operation |= INJECT_LOAD_LIBRARY_A;
+                    }
                     else if (!strncmp(arg_to_parse, "ManualMap", strlen("ManualMap")))
-                        operation |= INJECT_MANUAL_MAP;
+                    {
+                        *operation |= INJECT_MANUAL_MAP;
+                    }
                     else
+                    {
                         __usage_error("Unsupported injection method", argv[0]);
+                        return -1;
+                    }
+                    break;
+                }
+                case 'o':
+                {
+                    char arg_to_parse[256] = { 0 };
+                    if (i < argc - 1)
+                    {
+                        strncpy_s(arg_to_parse, sizeof(arg_to_parse), argv[i+1], sizeof(arg_to_parse));
+                    }
+                    else
+                    {
+                        __usage_error("Output file unknown", argv[0]);
+                        return -1;
+                    }
+                    break;
+                }
+                case 'r':
+                {
+                    break;
+                }
+                case 's':
+                {
+                    break;
+                }
+                case 'S':
+                {
+                    break;
+                }
+                case 'V':
+                case 'v':
+                {
+                    break;
+                }
+                case '-':
+                {
+                    char extended_switch[256] = { 0 };
+                    if (1) // TODO: condition
+                    {
+                        strncpy_s(extended_switch, sizeof(extended_switch), argv[i]+2, sizeof(extended_switch));
+                        printf("switch: %s\n", extended_switch);
 
+                        if (!strncmp(extended_switch, "output", strlen("output")))
+                        {
+                            char arg_to_parse[256] = { 0 };
+                            if (i < argc - 1)
+                            {
+                                strncpy_s(pInjector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
+                            }
+                            else
+                            {
+                                __usage_error("Output file unknown", argv[0]);
+                                return -1;
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        __usage_error("Output file unknown", argv[0]);
+                        return -1;
+                    }
                     break;
                 }
                 default:
                     break;
             }
         }
+
         i--;
     }
-    if (!operation)
-    {
-        operation = INJECT_LOAD_LIBRARY_A;
-    }
 
-    return operation;
+    return (*operation == 0 ? (pInjector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
 }

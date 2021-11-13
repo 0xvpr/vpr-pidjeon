@@ -7,39 +7,63 @@
 #include "manualmap.h"
 #include "injector.h"
 #include "parser.h"
+#include "data.h"
 #include <stdio.h>
+
+#define DEBUG
 
 int main(int argc, char* argv[])
 {
-    int inject_status = 0;
-    unsigned delay_ms = 0;
-    DWORD process_id = 0;
+    Injector injector = { .status      = 0,
+                          .operation   = 0,
+                          .delay_ms    = 0,
+                          .remote      = 0,
+                          .silent      = 0,
+                          .stealth     = 0,
+                          .verbosity   = 1,
+                          .output_file = "log.txt" };
 
-    int operation = ParseCommandLine(argc, argv, &delay_ms);
-    const char* target_process = argv[1];
-    const char* dll_rel_path = argv[2];
+    InjectData data = { 0 };
 
-    printf("Searching for %s...\n", target_process);
-    while (!process_id)
+    if (ParseCommandLine(argc, argv, &injector, &data) == -1) { return -1; }
+
+#ifdef DEBUG
+    printf("target: %s\n", data.target_process);       // DEBUG
+    printf("payload: %s\n", data.dll_rel_path);        // DEBUG
+    printf("output file: %s\n", injector.output_file); // DEBUG
+#endif
+
+    printf("Searching for %s...\n", data.target_process);
+    while (!data.process_id)
     {
-        process_id = GetProcessIdByProcessName(target_process);
+        data.process_id = GetProcessIdByProcessName(data.target_process);
     }
-    printf("%s Found.\n\n", target_process);
+    printf("%s Found.\n\n", data.target_process);
 
-    if (delay_ms)
+#ifdef DEBUG
+    printf("PID: %d\n", data.process_id);
+#endif
+
+    if (injector.delay_ms)
     {
-        printf("Delay(ms): %d\n\n", delay_ms);
-        Sleep(delay_ms);
+        printf("Delay(ms): %d\n\n", injector.delay_ms);
+        Sleep(injector.delay_ms);
     }
 
-    if (operation & INJECT_LOAD_LIBRARY_A)
-        inject_status = inject_LoadLibraryA(process_id, dll_rel_path);
-    else if (operation & INJECT_MANUAL_MAP)
-        inject_status = inject_ManualMap(process_id, dll_rel_path);
+    if (injector.operation & INJECT_LOAD_LIBRARY_A)
+    {
+        injector.status = inject_LoadLibraryA(data.process_id, data.dll_rel_path);
+    }
+    else if (injector.operation & INJECT_MANUAL_MAP)
+    {
+        injector.status = inject_ManualMap(data.process_id, data.dll_rel_path);
+    }
 
-    if (inject_status)
-        __handle_error(inject_status);
-    printf("Injection: %s.\n", (inject_status ? "Failed" : "Successful"));
+    if (injector.status)
+    {
+        __handle_error(injector.status);
+    }
+    printf("Injection: %s.\n", (injector.status ? "Failed" : "Successful"));
 
-    return inject_status;
+    return injector.status;
 }

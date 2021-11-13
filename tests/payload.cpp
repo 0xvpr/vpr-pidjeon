@@ -1,19 +1,12 @@
 #include <windows.h>
 #include <stdio.h>
 
+unsigned int address = 0x4b0010;
+
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
-  FILE* fp;
-  AllocConsole();
-  freopen_s(&fp, "CONOUT$", "w", stdout);
+  *(unsigned int *)address = 1337;
 
-  while (!GetAsyncKeyState(VK_SPACE))
-  {
-    //
-  }
-
-  fclose(fp);
-  FreeConsole();
   FreeLibraryAndExitThread((HMODULE)lpReserved, 0);
 
   return TRUE;

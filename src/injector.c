@@ -1,5 +1,6 @@
 #include "manualmap.h"
 #include "injector.h"
+#include "parser.h"
 #include <stdio.h>
 
 int inject_LoadLibraryA(DWORD process_id, const char* dll)
@@ -165,5 +166,43 @@ DWORD GetProcessIdByProcessName(const char* process_name)
     }
 
     CloseHandle(processes_snapshot);
+    return 0;
+}
+
+
+int InjectPayload(InjectData* data, Injector* injector)
+{
+    printf("Searching for %s->->->\n", data->target_process);
+    while (!data->process_id)
+    {
+        data->process_id = GetProcessIdByProcessName(data->target_process);
+    }
+    printf("%s Found->\n\n", data->target_process);
+
+#ifdef DEBUG
+    printf("PID: %d\n", data->process_id);
+#endif
+
+    if (injector->delay_ms)
+    {
+        printf("Delay(ms): %d\n\n", injector->delay_ms);
+        Sleep(injector->delay_ms);
+    }
+
+    if (injector->operation & INJECT_LOAD_LIBRARY_A)
+    {
+        injector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
+    }
+    else if (injector->operation & INJECT_MANUAL_MAP)
+    {
+        injector->status = inject_ManualMap(data->process_id, data->dll_rel_path);
+    }
+
+    if (injector->status)
+    {
+        __handle_error(injector->status);
+    }
+    printf("Injection: %s.\n", (injector->status ? "" : "Successful"));
+
     return 0;
 }

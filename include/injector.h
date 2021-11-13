@@ -10,6 +10,13 @@
 #define DLL_DOES_NOT_EXIST    0x00000002
 #define INJECTION_FAILED      0x00000004
 
+#define INJECT_LOAD_LIBRARY_A 0x00000001
+#define INJECT_LOAD_LIBRARY_W 0x00000002
+#define INJECT_MANUAL_MAP     0x00000004
+#define INJECT_CRT            0x00000008
+#define INJECT_ADD_DELAY      0x000000FF
+
+#include "data.h"
 #include <windows.h>
 #include <tlhelp32.h>
 #include <stdbool.h>
@@ -35,5 +42,7 @@ int inject_LoadLibraryA(DWORD process_id, const char* dll);
 int inject_ManualMap(DWORD process_id, const char* dll_path);
 
 void __handle_error(int error_code);
+
+int InjectPayload(InjectData* data, Injector* injector);
 
 #endif /* _INJECTOR_H */

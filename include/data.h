@@ -1,5 +1,5 @@
-#ifndef DATA_H
-#define DATA_H
+#ifndef _DATA_H
+#define _DATA_H
 
 typedef struct _InjectData
 {
@@ -8,4 +8,4 @@ typedef struct _InjectData
     char dll_rel_path[256];
 } InjectData;
 
-#endif /* DATA_H */
+#endif /* _DATA_H */

@@ -13,23 +13,27 @@
 #define INJECT_CRT            0x00000008
 #define INJECT_ADD_DELAY      0x000000FF
 
-typedef struct _InjectData
+#ifndef MAX_PATH
+#define MAX_PATH              0x000000FF
+#endif
+
+typedef struct _Resource
 {
     int process_id;
-    char target_process[256];
-    char dll_rel_path[256];
-} InjectData;
+    char target_process[MAX_PATH];
+    char dll_rel_path[MAX_PATH];
+} Resource;
 
 typedef struct _Injector
 {
-    int      status;
+    int      status:8;
     int      operation;
     unsigned delay_ms;
     int      remote:1;
     int      silent:1;
     int      stealth:1;
     int      verbosity:2;
-    char     output_file[256];
+    char     output_file[MAX_PATH];
 } Injector;
 
 #endif /* _DEFINITIONS_H */

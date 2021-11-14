@@ -2,14 +2,13 @@
 #define _MANUAL_MAP_H
 
 #ifdef _WIN32
-  #define WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #endif
 
-#include <windows.h>
-
-typedef HMODULE(__stdcall* pLoadLibraryA)(LPCSTR);
 typedef FARPROC(__stdcall* pGetProcAddress)(HMODULE, LPCSTR);
 typedef INT(__stdcall* dllmain)(HMODULE, DWORD, LPVOID);
+typedef HMODULE(__stdcall* pLoadLibraryA)(LPCSTR);
 
 typedef struct loaderdata
 {

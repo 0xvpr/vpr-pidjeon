@@ -4,59 +4,57 @@
 #include "injector.h"
 #include "parser.h"
 #include "util.h"
+#include "mem.h"
+#include "crt.h"
 #include <stdio.h>
 
-DWORD GetProcessIdByProcessName(const char* process_name)
+void InjectPayload(Resource* data, Injector* pInjector)
 {
-    PROCESSENTRY32 process_entry = { 0 };
-    process_entry.dwSize = sizeof(PROCESSENTRY32);
-    HANDLE processes_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-    if (Process32First(processes_snapshot, &process_entry))
-    {
-        do
-        {
-            if (strcmp(process_entry.szExeFile, process_name) == 0)
-            {
-                CloseHandle(processes_snapshot);
-                return process_entry.th32ProcessID;
-            } } while (Process32Next(processes_snapshot, &process_entry));
-    }
-
-    CloseHandle(processes_snapshot);
-    return 0;
-}
-
-void InjectPayload(InjectData* data, Injector* injector)
-{
-    // short verbosity = injector->verbosity;
-    // (void)verbosity;
-
-    printf("Searching for %s...\n", data->target_process);
+    fprintf(stdout, "Searching for %s...\n", data->target_process);
     while (!data->process_id)
     {
         data->process_id = GetProcessIdByProcessName(data->target_process);
+        Sleep(100);
     }
-    printf("%s Found.\n\n", data->target_process);
+    fprintf(stdout, "%s Found.\n\n", data->target_process);
 
-    if (injector->delay_ms)
+    if (pInjector->delay_ms)
     {
-        printf("Delay(ms): %d\n\n", injector->delay_ms);
-        Sleep(injector->delay_ms);
-    }
-
-    if (injector->operation & INJECT_LOAD_LIBRARY_A)
-    {
-        injector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
-    }
-    else if (injector->operation & INJECT_MANUAL_MAP)
-    {
-        injector->status = inject_ManualMap(data->process_id, data->dll_rel_path);
+        printf("Delay(ms): %d\n\n", pInjector->delay_ms);
+        Sleep(pInjector->delay_ms);
     }
 
-    if (injector->status)
+    switch (pInjector->operation)
     {
-        __handle_error(injector->status);
+        case INJECT_LOAD_LIBRARY_A:
+        {
+            pInjector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
+            break;
+        }
+        case INJECT_LOAD_LIBRARY_W:
+        {
+            // injector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
+            break;
+        }
+        case INJECT_MANUAL_MAP:
+        {
+            pInjector->status = inject_ManualMap(data->process_id, data->dll_rel_path);
+            break;
+        }
+        case INJECT_CRT:
+        {
+            pInjector->status = InjectExecuteShellcode(data, pInjector);
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
-    printf("Injection: %s.\n", (injector->status ? "" : "Successful"));
+
+    if (pInjector->status != 0)
+    {
+        __handle_error(pInjector->status);
+    }
+    printf("Injection: %s.\n", (pInjector->status ? "" : "Successful"));
 }

@@ -3,6 +3,6 @@
 
 #include "definitions.h"
 
-int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pData);
+int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector);
 
 #endif /* _PARSER_H */

@@ -4,8 +4,7 @@
 
 ### Features
 - [x] DLL injection
-- [ ] Remote thread injection
-- [ ] TBD
+- [x] Remote thread injection & execution
 
 ### Example uses
 Standard LoadLibraryA injection:
@@ -16,7 +15,7 @@ Silent Manual Map injection after 850 millisecond delay, output to out.txt using
 ```
 ./payload_injector_x86.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
 ```
-(TODO) Create remote thread using shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
+(TODO) Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
 ```
 ./payload_injector_x86.exe explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
 ```

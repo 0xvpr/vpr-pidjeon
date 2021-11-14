@@ -1,9 +1,11 @@
 #include "CUnit/Basic.h"
+#include "CUnit/Console.h"
 #include "definitions.h"
 #include "injector.h"
 #include "parser.h"
 #include "logger.h"
 #include <tchar.h>
+#include <stdbool.h>
 
 #define TEST_FILE "test_log.txt"
 
@@ -42,40 +44,44 @@ void testParseCommandLine_UnspecifiedInjector(void)
 {
     int argc = 3;
     char* argv[3] = { "injector.exe", "target.exe", "payload.dll" };
-    Injector injector = { .output_file = "log.txt" };
-    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &injector, &data));
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
 void testParseCommandLine_SpecifyLoadLibraryA(void)
 {
     int argc = 5;
     char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryA" };
-    Injector injector = { .output_file = "log.txt" };
-    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &injector, &data));
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
 void testParseCommandLine_SpecifyLoadLibraryW(void)
 {
     int argc = 5;
     char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryW" };
-    Injector injector = { .output_file = "log.txt" };
-    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_W, ParseCommandLine(argc, argv, &injector, &data));
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_W, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
 void testParseCommandLine_SpecifyManualMap(void)
 {
     int argc = 5;
     char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "ManualMap" };
-    Injector injector = { .output_file = "log.txt" };
-    InjectData data = { 0 };
 
-    CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &injector, &data));
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
 void testLogEvent_CreateLogFile(void)
@@ -172,6 +178,66 @@ void testPayloadInjector86_UnspecifiedInjector(void)
 void testPayloadInjector86_SpecifyLoadLibraryA(void)
 {
     LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll -i LoadLibraryA"));
+    DWORD exit_code;
+
+    PROCESS_INFORMATION dummy_pi = { 0 };
+    STARTUPINFO dummy_si         = { 0 };
+    BOOL bDummyProcess           = 0;
+    bDummyProcess = CreateProcess( "./bin/dummy_x86.exe",
+                                   NULL,
+                                   NULL,
+                                   NULL,
+                                   FALSE,
+                                   0,
+                                   NULL,
+                                   NULL,
+                                   &dummy_si,
+                                   &dummy_pi);
+
+    if (!bDummyProcess)
+    {
+        fprintf(stderr, "Dummy process not created.\n");
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
+    Sleep(500);
+
+    PROCESS_INFORMATION injector_pi = { 0 };
+    STARTUPINFO injector_si         = { 0 };
+    BOOL bInjectorProcess64         = 0;
+    bInjectorProcess64 = CreateProcessA( NULL,
+                                         injector_args,
+                                         NULL,
+                                         NULL,
+                                         FALSE,
+                                         0,
+                                         NULL,
+                                         NULL,
+                                         &injector_si,
+                                         &injector_pi);
+
+    if (!bInjectorProcess64)
+    {
+        fprintf(stderr, "Injector process not created.\n");
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
+    WaitForSingleObject(dummy_pi.hProcess, 500);
+    GetExitCodeProcess(dummy_pi.hProcess, &exit_code);
+
+    CloseHandle(dummy_pi.hProcess);
+    CloseHandle(dummy_pi.hThread);
+    CloseHandle(injector_pi.hProcess);
+    CloseHandle(injector_pi.hThread);
+
+    CU_ASSERT_EQUAL(1, exit_code);
+}
+
+void testPayloadInjector86_SpecifyLoadLibraryW(void)
+{
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll -i LoadLibraryW"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -409,6 +475,65 @@ void testPayloadInjector64_SpecifyLoadLibraryA(void)
     CU_ASSERT_EQUAL(1, exit_code);
 }
 
+void testPayloadInjector64_SpecifyLoadLibraryW(void)
+{
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll -i LoadLibraryW"));
+    DWORD exit_code;
+
+    PROCESS_INFORMATION dummy_pi = { 0 };
+    STARTUPINFO dummy_si         = { 0 };
+    BOOL bDummyProcess           = 0;
+    bDummyProcess = CreateProcess( "./bin/dummy_x64.exe",
+                                   NULL,
+                                   NULL,
+                                   NULL,
+                                   FALSE,
+                                   0,
+                                   NULL,
+                                   NULL,
+                                   &dummy_si,
+                                   &dummy_pi);
+
+    if (!bDummyProcess)
+    {
+        fprintf(stderr, "Dummy process not created.\n");
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
+    Sleep(500);
+
+    PROCESS_INFORMATION injector_pi = { 0 };
+    STARTUPINFO injector_si         = { 0 };
+    BOOL bInjectorProcess64         = 0;
+    bInjectorProcess64 = CreateProcessA( NULL,
+                                         injector_args,
+                                         NULL,
+                                         NULL,
+                                         FALSE,
+                                         0,
+                                         NULL,
+                                         NULL,
+                                         &injector_si,
+                                         &injector_pi);
+
+    if (!bInjectorProcess64)
+    {
+        fprintf(stderr, "Injector process not created.\n");
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
+    WaitForSingleObject(dummy_pi.hProcess, 500);
+    GetExitCodeProcess(dummy_pi.hProcess, &exit_code);
+
+    CloseHandle(dummy_pi.hProcess);
+    CloseHandle(dummy_pi.hThread);
+    CloseHandle(injector_pi.hProcess);
+    CloseHandle(injector_pi.hThread);
+
+    CU_ASSERT_EQUAL(1, exit_code);
+}
 void testPayloadInjector64_SpecifyManualMap(void)
 {
     LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll -i ManualMap"));
@@ -496,23 +621,27 @@ int main(void)
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
     if ( NULL == CU_add_test(pSuite, "test of InjectorPayload(Unspecified) -> LoadLibraryA", testParseCommandLine_UnspecifiedInjector) ||
          NULL == CU_add_test(pSuite, "test of InjectPayload(LoadLibraryA) -> LoadLibraryA", testParseCommandLine_SpecifyLoadLibraryA) ||
+         NULL == CU_add_test(pSuite, "test of InjectPayload(LoadLibraryW) -> LoadLibraryW", testParseCommandLine_SpecifyLoadLibraryW) ||
          NULL == CU_add_test(pSuite, "test of InjectPayload(ManualMap) -> ManualMap", testParseCommandLine_SpecifyManualMap) ||
          NULL == CU_add_test(pSuite, "test of LogEvent() -> Create log file", testLogEvent_CreateLogFile) ||
          NULL == CU_add_test(pSuite, "test of LogEvent() -> Append to log file", testLogEvent_AppendToLogFile) ||
          NULL == CU_add_test(pSuite, "test of payload_injector_x86 -> LoadLibraryA", testPayloadInjector86_UnspecifiedInjector) ||
          NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector86_SpecifyLoadLibraryA) ||
+         /*NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector86_SpecifyLoadLibraryW) ||*/
          NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i ManualMap -> ManualMap", testPayloadInjector86_SpecifyManualMap) ||
          NULL == CU_add_test(pSuite, "test of payload_injector_x64 -> LoadLibraryA", testPayloadInjector64_UnspecifiedInjector) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap) )
+         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) )
+         /*NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector64_SpecifyLoadLibraryW) ||*/
+         /*NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap)*/
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    /* Run all tests using the CUnit Basic interface */
+    // Run tests 
     CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
+    CU_basic_run_tests();      // Run tests automatically
+    // CU_console_run_tests(); // Run tests interactively
     CU_cleanup_registry();
 
     /* Remove log file */

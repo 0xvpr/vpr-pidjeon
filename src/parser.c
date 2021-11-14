@@ -1,14 +1,13 @@
-#ifdef _WIN32
-  #define WIN32_LEAN_AND_MEAN
-#endif
-
 #include "definitions.h"
 #include "parser.h"
 #include "util.h"
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #include <stdio.h>
 
-int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pData)
+int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector)
 {
     int* operation = &(pInjector->operation);
     int i = argc - 1;
@@ -20,8 +19,8 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
     }
     else
     {
-        strncpy_s(pData->target_process, MAX_PATH, argv[1], MAX_PATH);
-        strncpy_s(pData->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
+        strncpy_s(pResource->target_process, MAX_PATH, argv[1], MAX_PATH);
+        strncpy_s(pResource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
     }
 
     while (i > 2)
@@ -60,11 +59,15 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
                     
                     if (!strncmp(arg_to_parse, "LoadLibraryA", strlen("LoadLibraryA")))
                     {
-                        *operation |= INJECT_LOAD_LIBRARY_A;
+                        *operation = INJECT_LOAD_LIBRARY_A;
+                    }
+                    else if (!strncmp(arg_to_parse, "LoadLibraryW", strlen("LoadLibraryW")))
+                    {
+                        *operation = INJECT_LOAD_LIBRARY_W;
                     }
                     else if (!strncmp(arg_to_parse, "ManualMap", strlen("ManualMap")))
                     {
-                        *operation |= INJECT_MANUAL_MAP;
+                        *operation = INJECT_MANUAL_MAP;
                     }
                     else
                     {
@@ -87,10 +90,6 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
                     }
                     break;
                 }
-                case 'r':
-                {
-                    break;
-                }
                 case 's':
                 {
                     break;
@@ -104,6 +103,11 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
                 {
                     break;
                 }
+                case 'r':
+                {
+                    pInjector->operation = INJECT_CRT;
+                    break;
+                }
                 case '-':
                 {
                     char extended_switch[256] = { 0 };
@@ -114,14 +118,13 @@ int ParseCommandLine(int argc, char** argv, Injector* pInjector, InjectData* pDa
 
                         if (!strncmp(extended_switch, "output", strlen("output")))
                         {
-                            char arg_to_parse[256] = { 0 };
                             if (i < argc - 1)
                             {
                                 strncpy_s(pInjector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
                             }
                             else
                             {
-                                __usage_error("Output file unknown", argv[0]);
+                                __usage_error("Output file unspecified", argv[0]);
                                 return -1;
                             }
                             break;

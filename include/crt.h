@@ -4,6 +4,6 @@
 #include "definitions.h"
 #include "logger.h"
 
-int InjectExecuteShellcode(InjectData* injectorData, Injector* injector);
+int InjectExecuteShellcode(Resource* Resource, Injector* injector);
 
 #endif /* _CREATE_REMOTE_THREAD_H */

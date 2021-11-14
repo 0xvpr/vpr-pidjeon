@@ -1,19 +1,19 @@
 #include "manualmap.h"
 
-#include <stdio.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <tlhelp32.h>
+#endif
 #include <string.h>
 #include <stdint.h>
-
-#include <tlhelp32.h>
+#include <stdio.h>
 
 DWORD __stdcall LibraryLoader(LPVOID Memory)
 {
-
 	loaderdata* LoaderParams = (loaderdata*)Memory;
 
 	PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
 
-	/*DWORD delta = (uintptr_t)((LPBYTE)LoaderParams->ImageBase - LoaderParams->NtHeaders->OptionalHeader.ImageBase); // Calculate the delta*/
 	DWORD delta = (DWORD)((LPBYTE)LoaderParams->ImageBase - LoaderParams->NtHeaders->OptionalHeader.ImageBase); // Calculate the delta
 
 	while (pIBR->VirtualAddress)
@@ -55,9 +55,7 @@ DWORD __stdcall LibraryLoader(LPVOID Memory)
 			{
 				// Import by ordinal
 				DWORD Function = (DWORD)LoaderParams->fnGetProcAddress(hModule,
-					(LPCSTR)(OrigFirstThunk->u1.Ordinal & 0xFFFF)); // changed from DWORD
-				/*DWORD Function = (uintptr_t)LoaderParams->fnGetProcAddress(hModule,*/
-					/*(LPCSTR)(OrigFirstThunk->u1.Ordinal & 0xFFFF)); // changed from DWORD*/
+					(LPCSTR)(OrigFirstThunk->u1.Ordinal & 0xFFFF));
 
 				if (!Function)
 					return FALSE;
@@ -68,8 +66,7 @@ DWORD __stdcall LibraryLoader(LPVOID Memory)
 			{
 				// Import by name
 				PIMAGE_IMPORT_BY_NAME pIBN = (PIMAGE_IMPORT_BY_NAME)((LPBYTE)LoaderParams->ImageBase + OrigFirstThunk->u1.AddressOfData);
-				DWORD Function = (DWORD)LoaderParams->fnGetProcAddress(hModule, (LPCSTR)pIBN->Name); // changed from DWORD
-				/*DWORD Function = (uintptr_t)LoaderParams->fnGetProcAddress(hModule, (LPCSTR)pIBN->Name); // changed from DWORD*/
+				DWORD Function = (DWORD)LoaderParams->fnGetProcAddress(hModule, (LPCSTR)pIBN->Name);
 				if (!Function)
 					return FALSE;
 
@@ -85,7 +82,7 @@ DWORD __stdcall LibraryLoader(LPVOID Memory)
 	{
 		dllmain EntryPoint = (dllmain)((LPBYTE)LoaderParams->ImageBase + LoaderParams->NtHeaders->OptionalHeader.AddressOfEntryPoint);
 
-		return EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, NULL); // Call the entry point
+		return EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, NULL);
 	}
 	return TRUE;
 }
@@ -148,8 +145,6 @@ int inject_ManualMap(DWORD process_id, const char* dll_path)
 	WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(loaderdata), NULL);
     WriteProcessMemory(hProcess, (PVOID)((loaderdata*)LoaderMemory + 1), LibraryLoader,
 		(DWORD)stub - (DWORD)LibraryLoader, NULL); // changed from DWORD
-    /*WriteProcessMemory(hProcess, (PVOID)((loaderdata*)LoaderMemory + 1), LibraryLoader,*/
-		/*(uintptr_t)stub - (uintptr_t)LibraryLoader, NULL); // changed from DWORD*/
     
 	// Create a remote thread to execute the loader code
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((loaderdata*)LoaderMemory + 1),

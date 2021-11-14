@@ -8,15 +8,12 @@
 static bool FileExists(const char* file)
 {
     FILE* fp;
-
     if (!(fp = fopen(file, "rb")))
     {
         return false;
     }
-    else
-    {
-        return true;
-    }
+    
+    return true;
 }
 
 const char* InsertSpacing(int shiftwidth)

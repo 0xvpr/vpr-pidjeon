@@ -630,9 +630,9 @@ int main(void)
          /*NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector86_SpecifyLoadLibraryW) ||*/
          NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i ManualMap -> ManualMap", testPayloadInjector86_SpecifyManualMap) ||
          NULL == CU_add_test(pSuite, "test of payload_injector_x64 -> LoadLibraryA", testPayloadInjector64_UnspecifiedInjector) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) )
+         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) ||
          /*NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector64_SpecifyLoadLibraryW) ||*/
-         /*NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap)*/
+         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap) )
     {
         CU_cleanup_registry();
         return CU_get_error();

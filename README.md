@@ -36,8 +36,8 @@ make tests -j $(nproc) # -j recommended for build time
 
 ### TODO
 - [x] SWITCH: -o --output \<path/to/output\> -\> specify log file location
-- [ ] SWITCH: -r --remote -> specify remote thread routine
+- [x] SWITCH: -r --remote -> specify remote thread routine
   - [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave address
 - [ ] SWITCH: -s --silent -> disable logging
 - [ ] SWITCH: -S --stealth -> specify stealth level
-- [ ] SWITCH: -v -> specify verbosity level
+- [x] SWITCH: -v -> specify verbosity level

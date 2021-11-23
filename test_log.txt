@@ -1,0 +1,3 @@
+[2021-11-22 20:49:24]: Log file created.
+[2021-11-22 20:49:24]: Test of LogEvent's create log file.
+[2021-11-22 20:49:24]: Test of LogEvent's append to log file.

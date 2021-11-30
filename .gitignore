@@ -22,3 +22,6 @@ CUnit_log.txt
 
 # Exclude configuration files
 compile_flags.txt
+
+# Exclude Image Files
+*.psd

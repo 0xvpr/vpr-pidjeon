@@ -1,4 +1,5 @@
-# Pidjeon
+<img src="./resources/Banner.png"></img>
+
 **Pidjeon**, a mash of the words PID (process ID) and injection, is a command  
 line application for Windows that uses various injection techniques to embed  
 a specified payload into a target process.  

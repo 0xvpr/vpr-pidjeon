@@ -10,7 +10,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef WINBOOL (__stdcall * fWriteProcessMemory)(HANDLE, LPVOID, LPVOID, DWORD, PDWORD);
+// TODO: I have no idea what's wrong haha
+typedef WINBOOL (WINAPI * fWriteProcessMemory)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T*);
 fWriteProcessMemory pWriteProcessMemory;
 
 char* ExtractBytesFromFile(const char* f, size_t* size)

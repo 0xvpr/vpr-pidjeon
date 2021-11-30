@@ -1,15 +1,19 @@
 #include <windows.h>
 #include <stdio.h>
 
-unsigned int address = 0;
+uintptr_t address = 0;
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
   FILE* fp = NULL;
   if ((fp = fopen("temp.txt", "r")))
   {
+#ifdef _WIN64
+    fscanf(fp, "%llx", &address);
+#else
     fscanf(fp, "%x", &address);
-    *(unsigned int *)address = 1337;
+#endif
+    *(uintptr_t *)address = 1337;
     fclose(fp);
   }
 
@@ -19,6 +23,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
+  (void)lpReserved; // -Wunused-parameters
+
   switch (dwReason)
   {
     case DLL_PROCESS_ATTACH:

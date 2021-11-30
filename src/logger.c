@@ -59,7 +59,11 @@ int LogEvent(Injector* injector, const char* event, int shiftwidth)
         }
         else
         {
-            fprintf(stderr, "Error while opening '%s'.", output_file);
+            if (verbosity > 2)
+            {
+                fprintf(stderr, "Error while opening '%s'.", output_file);
+            }
+
             return -1;
         }
     }
@@ -80,7 +84,10 @@ int LogEvent(Injector* injector, const char* event, int shiftwidth)
     }
     else
     {
-        fprintf(stderr, "Error while opening '%s'.", output_file);
+        if (verbosity > 1)
+        {
+            fprintf(stderr, "Error while opening '%s'.", output_file);
+        }
         return -1;
     }
 

@@ -1,6 +1,9 @@
-# CLI Payload Injector
+# Pidjeon
+**Pidjeon was originally intended to be used in a WSL/MSYS environment**
 
-**This payload injector is intended to be used in a WSL/MSYS environment.**
+**Pidjeon**, a mash of of words PID (process ID) and injection, is a command  
+line application for windows that uses various injection methods to embed a  
+specified payload into a target process.  
 
 ### Features
 - [x] DLL injection
@@ -8,11 +11,11 @@
 
 ### Example uses
 Standard LoadLibraryA injection:
-```
+```powershell
 ./payload_injector_x86.exe explorer.exe test_payload.dll
 ```
 Silent Manual Map injection after 850 millisecond delay, output to out.txt using Stealth level 3:
-```
+```powershell
 ./payload_injector_x86.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
 ```
 (TODO) Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
@@ -21,7 +24,7 @@ Silent Manual Map injection after 850 millisecond delay, output to out.txt using
 ```
 
 ### Building (MinGW)
-```
+```powershell
 make # makes release binaries
 ```
 

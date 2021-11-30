@@ -15,6 +15,7 @@ out
 build
 
 # Exclude log files
+test_log.txt
 log.txt
 temp.txt
 CUnit_log.txt

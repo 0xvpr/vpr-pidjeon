@@ -1,4 +1,4 @@
-PROJECT = payload_injector
+PROJECT = pidjeon
 
 CC      = gcc
 CFLAGS  = -std=c99 -s -O2 -Wall -Wextra -DRELEASE

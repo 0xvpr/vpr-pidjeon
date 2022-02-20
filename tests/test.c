@@ -117,7 +117,7 @@ void testLogEvent_AppendToLogFile(void)
 
 void testPayloadInjector86_UnspecifiedInjector(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x86.exe dummy_x86.exe ./lib/payload_x86.dll"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -177,7 +177,7 @@ void testPayloadInjector86_UnspecifiedInjector(void)
 
 void testPayloadInjector86_SpecifyLoadLibraryA(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll -i LoadLibraryA"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x86.exe dummy_x86.exe ./lib/payload_x86.dll -i LoadLibraryA"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -237,7 +237,7 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
 
 void testPayloadInjector86_SpecifyLoadLibraryW(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll -i LoadLibraryW"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x86.exe dummy_x86.exe ./lib/payload_x86.dll -i LoadLibraryW"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -297,7 +297,7 @@ void testPayloadInjector86_SpecifyLoadLibraryW(void)
 
 void testPayloadInjector86_SpecifyManualMap(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x86.exe dummy_x86.exe ./bin/payload_x86.dll -i ManualMap"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x86.exe dummy_x86.exe ./lib/payload_x86.dll -i ManualMap"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -357,7 +357,7 @@ void testPayloadInjector86_SpecifyManualMap(void)
 
 void testPayloadInjector64_UnspecifiedInjector(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x64.exe dummy_x64.exe ./lib/payload_x64.dll"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -417,7 +417,7 @@ void testPayloadInjector64_UnspecifiedInjector(void)
 
 void testPayloadInjector64_SpecifyLoadLibraryA(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll -i LoadLibraryA"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x64.exe dummy_x64.exe ./lib/payload_x64.dll -i LoadLibraryA"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -477,7 +477,7 @@ void testPayloadInjector64_SpecifyLoadLibraryA(void)
 
 void testPayloadInjector64_SpecifyLoadLibraryW(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll -i LoadLibraryW"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x64.exe dummy_x64.exe ./lib/payload_x64.dll -i LoadLibraryW"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -536,7 +536,7 @@ void testPayloadInjector64_SpecifyLoadLibraryW(void)
 }
 void testPayloadInjector64_SpecifyManualMap(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/payload_injector_x64.exe dummy_x64.exe ./bin/payload_x64.dll -i ManualMap"));
+    LPTSTR injector_args = _tcsdup(TEXT("./bin/pidjeon_x64.exe dummy_x64.exe ./lib/payload_x64.dll -i ManualMap"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
@@ -625,14 +625,14 @@ int main(void)
          NULL == CU_add_test(pSuite, "test of InjectPayload(ManualMap) -> ManualMap", testParseCommandLine_SpecifyManualMap) ||
          NULL == CU_add_test(pSuite, "test of LogEvent() -> Create log file", testLogEvent_CreateLogFile) ||
          NULL == CU_add_test(pSuite, "test of LogEvent() -> Append to log file", testLogEvent_AppendToLogFile) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x86 -> LoadLibraryA", testPayloadInjector86_UnspecifiedInjector) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector86_SpecifyLoadLibraryA) ||
-         /*NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector86_SpecifyLoadLibraryW) ||*/
-         NULL == CU_add_test(pSuite, "test of payload_injector_x86 -i ManualMap -> ManualMap", testPayloadInjector86_SpecifyManualMap) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -> LoadLibraryA", testPayloadInjector64_UnspecifiedInjector) ||
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) ||
-         /*NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector64_SpecifyLoadLibraryW) ||*/
-         NULL == CU_add_test(pSuite, "test of payload_injector_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap) )
+         NULL == CU_add_test(pSuite, "test of pidjeon_x86 -> LoadLibraryA", testPayloadInjector86_UnspecifiedInjector) ||
+         NULL == CU_add_test(pSuite, "test of pidjeon_x86 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector86_SpecifyLoadLibraryA) ||
+         /*NULL == CU_add_test(pSuite, "test of pidjeon_x86 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector86_SpecifyLoadLibraryW) ||*/
+         NULL == CU_add_test(pSuite, "test of pidjeon_x86 -i ManualMap -> ManualMap", testPayloadInjector86_SpecifyManualMap) ||
+         NULL == CU_add_test(pSuite, "test of pidjeon_x64 -> LoadLibraryA", testPayloadInjector64_UnspecifiedInjector) ||
+         NULL == CU_add_test(pSuite, "test of pidjeon_x64 -i LoadLibraryA -> LoadLibraryA", testPayloadInjector64_SpecifyLoadLibraryA) ||
+         /*NULL == CU_add_test(pSuite, "test of pidjeon_x64 -i LoadLibraryW -> LoadLibraryW", testPayloadInjector64_SpecifyLoadLibraryW) ||*/
+         NULL == CU_add_test(pSuite, "test of pidjeon_x64 -i ManualMap -> ManualMap", testPayloadInjector64_SpecifyManualMap) )
     {
         CU_cleanup_registry();
         return CU_get_error();

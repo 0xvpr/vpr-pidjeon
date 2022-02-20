@@ -20,5 +20,10 @@ log.txt
 temp.txt
 CUnit_log.txt
 
+# Exclude bash
+.profile
+.bash_history
+.viminfo
+
 # Exclude Image Files
 *.psd

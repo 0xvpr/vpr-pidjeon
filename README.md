@@ -9,6 +9,15 @@ payload into a target process.
 ## Demonstration
 [ embed a demo ]
 
+## Environment (Requires Docker)
+```bash
+git clone https://github.com/0xvpr/Pidjeon
+cd Malicious-Software-Research
+chmod +x ./resources/build-image.sh ./resources/run-image.sh
+./resources/build-image.sh
+./resources/run-image.sh
+```
+
 ## Usage
 ### Primary Features
 - [x] DLL injection

@@ -1,43 +1,43 @@
-PROJECT = pidjeon
+PROJECT        = pidjeon
 
-CC      = gcc
-CFLAGS  = -std=c99 -s -O2 -Wall -Wextra -DRELEASE
-CC32    = $(addprefix i686-w64-mingw32-, $(CC))
-CC64    = $(addprefix x86_64-w64-mingw32-, $(CC))
+CC             = gcc
+CFLAGS         = -std=c99 -s -O2 -Wall -Wextra -DRELEASE
+CC32           = $(addprefix i686-w64-mingw32-, $(CC))
+CC64           = $(addprefix x86_64-w64-mingw32-, $(CC))
 
-CXX     = g++
-CXXFLAGS = -std=c++2a -s -static -Wall -Wextra -DDEBUG
-CXX32   = $(addprefix i686-w64-mingw32-, $(CXX))
-CXX64   = $(addprefix x86_64-w64-mingw32-, $(CXX))
+CXX            = g++
+CXXFLAGS       = -std=c++2a -s -static -Wall -Wextra -DDEBUG
+CXX32          = $(addprefix i686-w64-mingw32-, $(CXX))
+CXX64          = $(addprefix x86_64-w64-mingw32-, $(CXX))
 
-LD      = gcc
-LDFLAGS =
-LD32    = $(addprefix i686-w64-mingw32-, $(LD))
-LD64    = $(addprefix x86_64-w64-mingw32-, $(LD))
+LD             = gcc
+LDFLAGS        =
+LD32           = $(addprefix i686-w64-mingw32-, $(LD))
+LD64           = $(addprefix x86_64-w64-mingw32-, $(LD))
 
-INCLUDE = $(addprefix -I, include)
+INCLUDE        = $(addprefix -I, include)
 
-BIN     = bin
-SRC     = src
-OBJ     = build
-32OBJ   = $(OBJ)/x86
-64OBJ   = $(OBJ)/x64
-SOURCES = $(wildcard $(SRC)/*.c)
-32OBJS  = $(patsubst $(SRC)/%.c, $(32OBJ)/%.o, $(SOURCES))
-64OBJS  = $(patsubst $(SRC)/%.c, $(64OBJ)/%.o, $(SOURCES))
+BIN            = bin
+SRC            = src
+OBJ            = build
+32OBJ          = $(OBJ)/x86
+64OBJ          = $(OBJ)/x64
+SOURCES        = $(wildcard $(SRC)/*.c)
+32OBJS         = $(patsubst $(SRC)/%.c, $(32OBJ)/%.o, $(SOURCES))
+64OBJS         = $(patsubst $(SRC)/%.c, $(64OBJ)/%.o, $(SOURCES))
 
-TEST_TARGET   = run-tests
-TEST          = tests
-TESTS         = $(wildcard $(TEST)/*.c) $(filter-out %main.c,$(SOURCES))
-TEST_OBJS     = $(patsubst $(TEST)/%.c, $(OBJ)/%.o, $(TESTS))
-TEST_LIBDIR   = /usr/local/share/mingw64/lib
-TEST_INCLUDE  = /usr/local/share/mingw64/include include
-TEST_LIB      = cunit
-TEST_LIBDIRS  = $(addprefix -L, $(TEST_LIBDIR))
-TEST_INCLUDES = $(addprefix -I, $(TEST_INCLUDE))
-TEST_LIBS     = $(addprefix -l, $(TEST_LIB))
-TEST_CFLAGS   = $(CFLAGS)
-TEST_LDFLAGS  = $(TEST_LIBDIRS) $(TEST_LIBS) # -static
+TEST_TARGET    = run-tests
+TEST           = tests
+TESTS          = $(wildcard $(TEST)/*.c) $(filter-out %main.c,$(SOURCES))
+TEST_OBJS      = $(patsubst $(TEST)/%.c, $(OBJ)/%.o, $(TESTS))
+TEST_LIBDIR    = /usr/local/share/mingw64/lib
+TEST_INCLUDE   = /usr/local/share/mingw64/include include
+TEST_LIB       = cunit
+TEST_LIBDIRS   = $(addprefix -L, $(TEST_LIBDIR))
+TEST_INCLUDES  = $(addprefix -I, $(TEST_INCLUDE))
+TEST_LIBS      = $(addprefix -l, $(TEST_LIB))
+TEST_CFLAGS    = $(CFLAGS)
+TEST_LDFLAGS   = $(TEST_LIBDIRS) $(TEST_LIBS) # -static
 
 DUMMY_TARGET   = dummy
 DUMMY          = $(TEST)/$(DUMMY_TARGET).cpp

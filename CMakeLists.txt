@@ -52,10 +52,10 @@ set_target_properties(
 
 # -------------- DUMMY -------------- #
 
-project(dummy CXX)
+project(dummy C)
 set(DUMMY dummy)
 set(DUMMY_DIR tests)
-set(DUMMY_SOURCES ${DUMMY_DIR}/dummy.cpp)
+set(DUMMY_SOURCES ${DUMMY_DIR}/dummy.c)
 
 ## Dummy executable
 add_executable(${DUMMY} ${DUMMY_SOURCES}) 
@@ -70,10 +70,10 @@ set_target_properties(
 
 # ------------- PAYLOAD ------------- #
 
-project(payload CXX)
+project(payload C)
 set(PAYLOAD payload)
 set(PAYLOAD_DIR tests)
-set(PAYLOAD_SOURCES ${PAYLOAD_DIR}/payload.cpp)
+set(PAYLOAD_SOURCES ${PAYLOAD_DIR}/payload.c)
 
 ## Dummy executable
 add_library(${PAYLOAD} SHARED ${PAYLOAD_SOURCES}) 

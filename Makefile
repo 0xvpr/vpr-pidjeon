@@ -14,6 +14,8 @@ TEST        = test
 SOURCES     = $(wildcard $(SOURCE)/*.c)
 OBJECTS     = $(patsubst $(SOURCE)/%.c,$(BUILD)/CMakeFiles/$(PROJECT).dir/$(SOURCE)/%.c.o,$(SOURCES))
 
+MAKEFLAGS  += -j$(shell nproc)
+
 all: $(PROJECT)
 $(PROJECT): x64 x86
 

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.8.0)
 
 ## Initialize project
-project(pidjeon C)
-set(TARGET pidjeon)
+project(vpr-pidjeon C)
+set(TARGET vpr-pidjeon)
 
 ## Set output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -46,7 +46,7 @@ add_executable(${TARGET} ${SOURCES})
 set_target_properties(
     ${TARGET}
     PROPERTIES
-    OUTPUT_NAME ${TARGET}_${ARCH}
+    OUTPUT_NAME ${TARGET}-${ARCH}
     SUFFIX ".exe"
 )
 

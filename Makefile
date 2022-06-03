@@ -18,22 +18,20 @@ ifeq ($(PREFIX),)
 PREFIX    = /usr/local
 endif
 
-MAKEFLAGS  += -j$(shell nproc)
-
 all: $(PROJECT)
 $(PROJECT): wrapper x64 x86
 
 wrapper:
 	$(CMAKE) -B $(BUILD)/Wrapper $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) --build $(BUILD)/Wrapper
+	$(CMAKE) --build $(BUILD)/Wrapper -j$(shell nproc)
 
 x64: CMakeLists.txt
 	$(CMAKE) -B $(BUILD)/x64 $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) --build $(BUILD)/x64
+	$(CMAKE) --build $(BUILD)/x64 -j$(shell nproc)
 
 x86: CMakeLists.txt
 	$(CMAKE) -B $(BUILD)/x86 $(TOOLCHAIN) -DARCH="x86"
-	$(CMAKE) --build $(BUILD)/x86
+	$(CMAKE) --build $(BUILD)/x86 -j$(shell nproc)
 
 .PHONY: $(OBJECTS)
 CMakeLists.txt: $(OBJECTS)
@@ -41,15 +39,15 @@ CMakeLists.txt: $(OBJECTS)
 
 .PHONY: install
 install: wrapper x64 x86
-	cp $(BIN)/$(PROJECT)_x86.exe $(BIN)/$(PROJECT)_x86
-	cp $(BIN)/$(PROJECT)_x64.exe $(BIN)/$(PROJECT)_x64
-	cp $(BIN)/$(PROJECT)_x64.exe $(BIN)/$(PROJECT)
+	cp $(BIN)/$(PROJECT)-x86.exe $(BIN)/$(PROJECT)-x86
+	cp $(BIN)/$(PROJECT)-x64.exe $(BIN)/$(PROJECT)-x64
+	cp $(BIN)/$(PROJECT)-x64.exe $(BIN)/$(PROJECT)
 	install -d $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)_x86 $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)_x64 $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x86 $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x64 $(PREFIX)/bin
 	install -m 555 $(BIN)/$(PROJECT)     $(PREFIX)/bin
-	rm $(BIN)/$(PROJECT)_x86
-	rm $(BIN)/$(PROJECT)_x64
+	rm $(BIN)/$(PROJECT)-x86
+	rm $(BIN)/$(PROJECT)-x64
 	rm $(BIN)/$(PROJECT)
 
 clean:

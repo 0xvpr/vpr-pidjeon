@@ -1,4 +1,4 @@
--std=c99
+-std=c17
 --target=i686-pc-windows-msvc
 -Iinclude
 -isystem/usr/CUnit/include

@@ -1,4 +1,5 @@
 #include "pe32.h"
+#include "util.h"
 #include "mem.h"
 
 #include <string.h>
@@ -10,11 +11,11 @@
 #include <psapi.h>
 #endif /* VC_EXTRA_LEAN */
 
-// TODO: Determine if file is PE
+// TODO: Validate arguments
 // TODO: Check to see if vpr-pidjeon-x64.exe exists
 // TODO: Check to see if vpr-pidjeon-x86.exe exists
 
-int get_archtitecture(char* restrict file_path)
+int GetArchitechture(char* restrict file_path)
 {
     FILE* fp;
     Pe32FullHeader header = { 0 };
@@ -32,29 +33,26 @@ int get_archtitecture(char* restrict file_path)
         fclose(fp);
         return -1;
     }
+    fclose(fp);
 
     if (header.msDosStub.mMagic != *(uint16_t *)"MZ")
     {
         fprintf(stderr, "File does not start with magic bits 'MZ': %s\n", file_path);
-        fclose(fp);
         return 0;
     }
 
     if (header.pe32PlusOptionalHeader.mMagic == 0x010b)
     {
         fprintf(stdout, "%s\n", "PE32 detected.");
-        fclose(fp);
         return 1;
     }
 
     if (header.pe32PlusOptionalHeader.mMagic == 0x020b)
     {
-        fprintf(stdout, "%s\n", "PE32+ detected");
-        fclose(fp);
+        fprintf(stdout, "%s\n", "PE32+ detected.");
         return 2;
     }
 
-    fclose(fp);
     return 0;
 }
 
@@ -62,42 +60,59 @@ int main(int argc, char** argv)
 {
     PROCESS_INFORMATION pi = { 0 };
     STARTUPINFO         si = { 0 };
+    HANDLE              p = NULL;
+    DWORD               pid = 0;
+    BOOL                arch = 0;
     BOOL                rv = 0;
+    char                full_path[MAX_PATH] = { 0 };
+    char                command[4096] = { 0 };
 
     if (argc < 3)
     {
-        return -1;
+        __usage_error("positional arguments required", argv[0]);
     }
 
-    // TODO: DELETE ME
+    // TODO: FIX ME
     {
-        char buffer[MAX_PATH];
-        HANDLE p = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetProcessIdByProcessName(argv[1]));
-        GetModuleFileNameExA(p, NULL, buffer, MAX_PATH);
+        pid = GetProcessIdByProcessName(argv[1]);
+        p = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+        if (!p)
+        {
+            fprintf(stderr, "Failed to query process: %s\n", argv[1]);
+            return 2;
+        }
+
+        GetModuleFileNameExA(p, NULL, full_path, MAX_PATH);
         CloseHandle(p);
-        fprintf(stdout, "%s\n", buffer);
+        fprintf(stdout, "%s\n", full_path);
     }
 
-    char command[1024] = { 0 };
-    int arch = get_archtitecture(argv[1]);
+    GetArchitechture(full_path);
     switch (arch)
     {
+        case -1:
+        {
+            fprintf(stderr, "Failed to detect architecture: %s\n", full_path);
+            return 127;
+        }
         case 0:
         {
             fprintf(stderr, "%s\n", "Not a PE32\n");
-            return -1;
+            return 128;
             break;
         }
         case 1:
         {
-            fprintf(stdout, "Selecting %s.\n", "vpr-pidjeon-x86.exe");
-            snprintf(command, sizeof(command), "%s", "vpr-pidjeon-x86.exe");
+            char injector[256] = "vpr-pidjeon-x86.exe";
+            fprintf(stdout, "Selecting %s.\n", injector);
+            snprintf(command, sizeof(command), "%s", injector);
             break;
         }
         case 2:
         {
-            fprintf(stdout, "Selecting %s.\n", "vpr-pidjeon-x64.exe");
-            snprintf(command, sizeof(command), "%s", "vpr-pidjeon-x64.exe");
+            char injector[256] = "vpr-pidjeon-x64.exe";
+            fprintf(stdout, "Selecting %s.\n", injector);
+            snprintf(command, sizeof(command), "%s", injector);
             break;
         }
     }

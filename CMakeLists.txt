@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.8.0)
 if (${ARCH} STREQUAL "x64")
     project(wrapper C)
     set(TARGET wrapper)
+    set(EXE_NAME vpr-pidjeon)
 
     ## Set output directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -20,10 +21,12 @@ if (${ARCH} STREQUAL "x64")
     set(SOURCES
         # CXX sources
         ${SOURCE_DIR}/mem.c
+        ${SOURCE_DIR}/util.c
         ${SOURCE_DIR}/wrapper.c
         # CXX includes
         ${INCLUDE_DIR}/mem.h
         ${INCLUDE_DIR}/pe32.h
+        ${INCLUDE_DIR}/util.h
     )
 
     ## Application executable and link dependencies
@@ -36,16 +39,17 @@ if (${ARCH} STREQUAL "x64")
     set_target_properties(
         ${TARGET}
         PROPERTIES
-        OUTPUT_NAME ${TARGET}
+        OUTPUT_NAME ${EXE_NAME}
         SUFFIX ".exe"
     )
 endif()
 
-# -------------- DUMMY -------------- #
+# --------------- vpr-pidjeon --------------- #
 
 ## Initialize project
 project(vpr-pidjeon C)
 set(TARGET vpr-pidjeon)
+set(EXE_NAME vpr-pidjeon)
 
 ## Set output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -89,7 +93,7 @@ add_executable(${TARGET} ${SOURCES})
 set_target_properties(
     ${TARGET}
     PROPERTIES
-    OUTPUT_NAME ${TARGET}-${ARCH}
+    OUTPUT_NAME ${EXE_NAME}-${ARCH}
     SUFFIX ".exe"
 )
 
@@ -107,7 +111,7 @@ add_executable(${DUMMY} ${DUMMY_SOURCES})
 set_target_properties(
     ${DUMMY}
     PROPERTIES
-    OUTPUT_NAME ${DUMMY}_${ARCH}
+    OUTPUT_NAME ${DUMMY}-${ARCH}
     SUFFIX ".exe"
 )
 
@@ -125,7 +129,7 @@ add_library(${PAYLOAD} SHARED ${PAYLOAD_SOURCES})
 set_target_properties(
     ${PAYLOAD}
     PROPERTIES
-    OUTPUT_NAME ${PAYLOAD}_${ARCH}
+    OUTPUT_NAME ${PAYLOAD}-${ARCH}
     PREFIX ""
     SUFFIX ".dll"
 )

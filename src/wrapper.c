@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 
     if (argc < 3)
     {
-        __usage_error("positional arguments required", argv[0]);
+        __usage_error("Missing positional arguments", argv[0]);
     }
 
     // TODO: FIX ME

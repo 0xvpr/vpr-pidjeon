@@ -25,3 +25,25 @@ DWORD GetProcessIdByProcessName(const char* process_name)
     CloseHandle(processes_snapshot);
     return 0;
 }
+
+DWORD GetPathByProcessId(const char* process_name)
+{
+    PROCESSENTRY32 process_entry = { 0 };
+    process_entry.dwSize = sizeof(PROCESSENTRY32);
+    HANDLE processes_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (Process32First(processes_snapshot, &process_entry))
+    {
+        do
+        {
+            if (strcmp(process_entry.szExeFile, process_name) == 0)
+            {
+                CloseHandle(processes_snapshot);
+                return process_entry.th32ProcessID;
+            }
+        } while (Process32Next(processes_snapshot, &process_entry));
+    }
+
+    CloseHandle(processes_snapshot);
+    return 0;
+}

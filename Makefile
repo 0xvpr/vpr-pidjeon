@@ -9,41 +9,48 @@ BIN         = bin
 BUILD       = build
 SOURCE      = src
 INCLUDE     = include
-TEST        = test
+TEST        = src/test
 
 SOURCES     = $(wildcard $(SOURCE)/*.c)
 OBJECTS     = $(patsubst $(SOURCE)/%.c,$(BUILD)/CMakeFiles/$(PROJECT).dir/$(SOURCE)/%.c.o,$(SOURCES))
-
-MAKEFLAGS  += -j$(shell nproc)
 
 ifeq ($(PREFIX),)
 PREFIX    = /usr/local
 endif
 
+MAKEFLAGS  += -j$(shell nproc)
+
 all: $(PROJECT)
-$(PROJECT): x64 x86
+$(PROJECT): wrapper x64 x86
+
+wrapper:
+	$(CMAKE) -B $(BUILD)/Wrapper $(TOOLCHAIN64) -DARCH="x64"
+	$(CMAKE) --build $(BUILD)/Wrapper
 
 x64: CMakeLists.txt
 	$(CMAKE) -B $(BUILD)/x64 $(TOOLCHAIN64) -DARCH="x64"
 	$(CMAKE) --build $(BUILD)/x64
 
 x86: CMakeLists.txt
-	$(CMAKE) -B $(BUILD) $(TOOLCHAIN) -DARCH="x86"
-	$(CMAKE) --build $(BUILD)
+	$(CMAKE) -B $(BUILD)/x86 $(TOOLCHAIN) -DARCH="x86"
+	$(CMAKE) --build $(BUILD)/x86
 
 .PHONY: $(OBJECTS)
 CMakeLists.txt: $(OBJECTS)
 	make clean
 
 .PHONY: install
-install: x64 x86
+install: wrapper x64 x86
 	cp $(BIN)/$(PROJECT)_x86.exe $(BIN)/$(PROJECT)_x86
 	cp $(BIN)/$(PROJECT)_x64.exe $(BIN)/$(PROJECT)_x64
+	cp $(BIN)/$(PROJECT)_x64.exe $(BIN)/$(PROJECT)
 	install -d $(PREFIX)/bin
 	install -m 555 $(BIN)/$(PROJECT)_x86 $(PREFIX)/bin
 	install -m 555 $(BIN)/$(PROJECT)_x64 $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)     $(PREFIX)/bin
 	rm $(BIN)/$(PROJECT)_x86
 	rm $(BIN)/$(PROJECT)_x64
+	rm $(BIN)/$(PROJECT)
 
 clean:
 	rm -fr bin/*

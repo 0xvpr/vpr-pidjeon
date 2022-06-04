@@ -1,5 +1,5 @@
 PROJECT     = vpr-pidjeon
-VERSION     = 0.3
+VERSION     = 0.4
 
 CMAKE       = cmake
 TOOLCHAIN   = -DCMAKE_TOOLCHAIN_FILE="mingw-toolchain.cmake"

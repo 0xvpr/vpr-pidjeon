@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "util.h"
 
-int inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
+unsigned inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
 {
     if (process_id == 0)
     {
@@ -58,7 +58,7 @@ int inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
     return 0;
 }
 
-int inject_LoadLibraryW(DWORD process_id, const char* restrict dll)
+unsigned inject_LoadLibraryW(DWORD process_id, const char* restrict dll)
 {
     if (process_id == 0)
     {

@@ -1,10 +1,10 @@
-#ifndef _LOGGER_H
-#define _LOGGER_H
+#ifndef LOGGER_HEADER
+#define LOGGER_HEADER
 
 #include "definitions.h"
 
-const char* InsertSpacing(int shiftwidth);
+const char* InsertSpacing(unsigned shiftwidth);
 
-int LogEvent(Injector* injector, const char* event, int shiftwidth);
+int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth);
 
-#endif /* _LOGGER_H */
+#endif /* LOGGER_HEADER */

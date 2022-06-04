@@ -14,8 +14,8 @@
 #define INJECT_ADD_DELAY      0x000000FF
 
 #ifndef MAX_PATH
-#define MAX_PATH              0x000000FF
-#endif
+#define MAX_PATH              0x00000104
+#endif /* MAX_PATH */
 
 typedef struct _Resource
 {
@@ -26,7 +26,7 @@ typedef struct _Resource
 
 typedef struct _Injector
 {
-    int         status:8;
+    unsigned    status:8;
     int         operation;
     unsigned    delay_ms;
     int         remote:1;

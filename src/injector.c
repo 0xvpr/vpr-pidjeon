@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-void InjectPayload(Resource* data, Injector* pInjector)
+void InjectPayload(Resource* restrict data, Injector* restrict pInjector)
 {
     fprintf(stdout, "Searching for %s...\n", data->target_process);
     while (!data->process_id)
@@ -34,7 +34,7 @@ void InjectPayload(Resource* data, Injector* pInjector)
         }
         case INJECT_LOAD_LIBRARY_W:
         {
-            pInjector->status = inject_LoadLibraryW(data->process_id, data->dll_rel_path);
+            pInjector->status = inject_LoadLibraryW((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_MANUAL_MAP:

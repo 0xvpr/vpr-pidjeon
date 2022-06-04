@@ -1,9 +1,11 @@
-#include "definitions.h"
 #include "util.h"
+#include "pe32.h"
+#include "definitions.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
-void __usage_error(const char* msg, char* argv_0)
+void __usage_error(const char* restrict msg, char* argv_0)
 {
     fprintf(stderr,
         "Error message: %s.\n"
@@ -30,7 +32,7 @@ void __usage_error(const char* msg, char* argv_0)
     exit(1);
 }
 
-void __handle_error(int inject_code)
+void __handle_error(unsigned inject_code)
 {
     switch (inject_code)
     {
@@ -51,13 +53,55 @@ void __handle_error(int inject_code)
     }
 }
 
-bool DllPathIsValid(TCHAR full_path[260])
+int DllPathIsValid(char* restrict full_path)
 {
     FILE* fp;
-    if (fopen_s(&fp, TEXT(full_path), "r"))
+    if (fopen_s(&fp, TEXT(full_path), "rb"))
+    {
         fclose(fp);
-    else
-        return false;
+        return 0;
+    }
 
-    return true;
+    return 1;
+}
+
+int GetArchitechture(char* restrict file_path)
+{
+    FILE* fp;
+    Pe32FullHeader header = { 0 };
+
+    if (!(fp = fopen(file_path, "rb")))
+    {
+        fprintf(stderr, "Failed to open: %s\n", file_path);
+        return -1;
+    }
+
+    fseek(fp, 0, SEEK_SET);
+    if (!fread((void *)&header, sizeof(header), 1, fp))
+    {
+        fprintf(stderr, "Failed to read: %s\n", file_path);
+        fclose(fp);
+        return -1;
+    }
+    fclose(fp);
+
+    if (header.msDosStub.mMagic != *(uint16_t *)"MZ")
+    {
+        fprintf(stderr, "File does not start with magic bits 'MZ': %s\n", file_path);
+        return 0;
+    }
+
+    if (header.pe32PlusOptionalHeader.mMagic == 0x010b)
+    {
+        fprintf(stdout, "%s\n", "PE32 detected.");
+        return 1;
+    }
+
+    if (header.pe32PlusOptionalHeader.mMagic == 0x020b)
+    {
+        fprintf(stdout, "%s\n", "PE32+ detected.");
+        return 2;
+    }
+
+    return 0;
 }

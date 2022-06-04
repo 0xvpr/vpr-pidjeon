@@ -25,15 +25,15 @@ $(PROJECT): wrapper x64 x86
 
 wrapper:
 	$(CMAKE) -B $(BUILD)/Wrapper $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) $(CMAKE_FLAGS) --build $(BUILD)/Wrapper
+	$(CMAKE) --build $(BUILD)/Wrapper $(CMAKE_FLAGS)
 
 x64: CMakeLists.txt
 	$(CMAKE) -B $(BUILD)/x64 $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) $(CMAKE_FLAGS) --build $(BUILD)/x64
+	$(CMAKE) --build $(BUILD)/x64 $(CMAKE_FLAGS)
 
 x86: CMakeLists.txt
 	$(CMAKE) -B $(BUILD)/x86 $(TOOLCHAIN) -DARCH="x86"
-	$(CMAKE) $(CMAKE_FLAGS) --build $(BUILD)/x86
+	$(CMAKE) --build $(BUILD)/x86 $(CMAKE_FLAGS)
 
 .PHONY: $(OBJECTS)
 CMakeLists.txt: $(OBJECTS)

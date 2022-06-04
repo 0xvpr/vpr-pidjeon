@@ -1,4 +1,3 @@
-#include "pe32.h"
 #include "util.h"
 #include "mem.h"
 
@@ -11,50 +10,11 @@
 #include <psapi.h>
 #endif /* VC_EXTRA_LEAN */
 
-// TODO: Validate arguments
+// TODO: Validate process
+// TODO: Validate DLL path
+// TODO: Move wait loop function to here
 // TODO: Check to see if vpr-pidjeon-x64.exe exists
 // TODO: Check to see if vpr-pidjeon-x86.exe exists
-
-int GetArchitechture(char* restrict file_path)
-{
-    FILE* fp;
-    Pe32FullHeader header = { 0 };
-
-    if (!(fp = fopen(file_path, "rb")))
-    {
-        fprintf(stderr, "Failed to open: %s\n", file_path);
-        return -1;
-    }
-
-    fseek(fp, 0, SEEK_SET);
-    if (!fread((void *)&header, sizeof(header), 1, fp))
-    {
-        fprintf(stderr, "Failed to read: %s\n", file_path);
-        fclose(fp);
-        return -1;
-    }
-    fclose(fp);
-
-    if (header.msDosStub.mMagic != *(uint16_t *)"MZ")
-    {
-        fprintf(stderr, "File does not start with magic bits 'MZ': %s\n", file_path);
-        return 0;
-    }
-
-    if (header.pe32PlusOptionalHeader.mMagic == 0x010b)
-    {
-        fprintf(stdout, "%s\n", "PE32 detected.");
-        return 1;
-    }
-
-    if (header.pe32PlusOptionalHeader.mMagic == 0x020b)
-    {
-        fprintf(stdout, "%s\n", "PE32+ detected.");
-        return 2;
-    }
-
-    return 0;
-}
 
 int main(int argc, char** argv)
 {

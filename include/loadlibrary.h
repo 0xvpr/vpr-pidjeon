@@ -1,11 +1,12 @@
-#ifndef _LOAD_LIBRARY_H
-#define _LOAD_LIBRARY_H
+#ifndef LOAD_LIBRARY_HEADER
+#define LOAD_LIBRARY_HEADER
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
 #include <windows.h>
-#endif
+#endif /* VC_EXTRA_LEAN */
 
 int inject_LoadLibraryA(DWORD process_id, const char* dll);
+int inject_LoadLibraryW(DWORD process_id, const char* dll);
 
-#endif /* LOAD_LIBRARY_H */
+#endif /* LOAD_LIBRARY_HEADER */

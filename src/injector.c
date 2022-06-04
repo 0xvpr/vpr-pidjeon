@@ -6,6 +6,7 @@
 #include "util.h"
 #include "mem.h"
 #include "crt.h"
+
 #include <stdio.h>
 
 void InjectPayload(Resource* data, Injector* pInjector)
@@ -28,17 +29,17 @@ void InjectPayload(Resource* data, Injector* pInjector)
     {
         case INJECT_LOAD_LIBRARY_A:
         {
-            pInjector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
+            pInjector->status = inject_LoadLibraryA((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_LOAD_LIBRARY_W:
         {
-            // injector->status = inject_LoadLibraryA(data->process_id, data->dll_rel_path);
+            pInjector->status = inject_LoadLibraryW(data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_MANUAL_MAP:
         {
-            pInjector->status = inject_ManualMap(data->process_id, data->dll_rel_path);
+            pInjector->status = inject_ManualMap((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_CRT:
@@ -56,5 +57,5 @@ void InjectPayload(Resource* data, Injector* pInjector)
     {
         __handle_error(pInjector->status);
     }
-    printf("Injection: %s.\n", (pInjector->status ? "" : "Successful"));
+    printf("Injection: %s.\n", (pInjector->status ? "Failed" : "Successful"));
 }

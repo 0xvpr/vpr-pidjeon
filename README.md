@@ -13,10 +13,8 @@ payload into a target process.
 ```bash
 git clone https://github.com/0xvpr/Pidjeon
 cd Pidjeon
-chmod +x ./resources/build-image.sh
-chmod +x ./resources/run-image.sh
-./resources/build-image.sh
-./resources/run-image.sh
+chmod +x ./env/docker-buld.sh ./env/docker-run.sh
+./env/docker-buld.sh && ./env/docker-run.sh
 ```
 
 ## Usage

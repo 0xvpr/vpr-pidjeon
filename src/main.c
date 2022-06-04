@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
     Resource resource = { 0 };
     Injector injector = { .status      = 0,

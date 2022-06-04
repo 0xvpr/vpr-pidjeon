@@ -1,16 +1,17 @@
 #include "manualmap.h"
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
 #include <tlhelp32.h>
-#endif
+#endif /* VC_EXTRA_LEAN */
+
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 
-DWORD __stdcall LibraryLoader(LPVOID Memory)
+DWORD __stdcall LibraryLoader(LPVOID memory)
 {
-    loaderdata* LoaderParams = (loaderdata*)Memory;
+    loaderdata* LoaderParams = (loaderdata*)memory;
     PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
 
     uintptr_t delta = (uintptr_t)((LPBYTE)LoaderParams->ImageBase - LoaderParams->NtHeaders->OptionalHeader.ImageBase); // Calculate the delta
@@ -80,8 +81,7 @@ DWORD __stdcall LibraryLoader(LPVOID Memory)
     if (LoaderParams->NtHeaders->OptionalHeader.AddressOfEntryPoint)
     {
         dllmain EntryPoint = (dllmain)((LPBYTE)LoaderParams->ImageBase + LoaderParams->NtHeaders->OptionalHeader.AddressOfEntryPoint);
-
-        return EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, NULL);
+        return (DWORD)EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, NULL);
     }
 
     return TRUE;
@@ -92,7 +92,7 @@ DWORD __stdcall stub(void)
     return 0;
 }
 
-int inject_ManualMap(DWORD process_id, const char* dll_path)
+unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
 {
     loaderdata LoaderParams;
     TCHAR abs_dll_path[MAX_PATH];
@@ -142,7 +142,7 @@ int inject_ManualMap(DWORD process_id, const char* dll_path)
 
     // Write the loader information to target process 
     WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(loaderdata), NULL);
-    WriteProcessMemory(hProcess, (PVOID)((loaderdata*)LoaderMemory + 1), LibraryLoader,
+    WriteProcessMemory(hProcess, (PVOID)((loaderdata*)LoaderMemory + 1), (LPCVOID)LibraryLoader,
         (uintptr_t)stub - (uintptr_t)LibraryLoader, NULL); // changed from DWORD
     
     
@@ -154,5 +154,5 @@ int inject_ManualMap(DWORD process_id, const char* dll_path)
     WaitForSingleObject(hThread, INFINITE);
     VirtualFreeEx(hProcess, LoaderMemory, 0, MEM_RELEASE);
 
-    return 0;
+    return FALSE;
 }

@@ -1,30 +1,32 @@
 #include "logger.h"
-#include <time.h>
-/*#include <string.h>*/
-#include <stdbool.h>
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
-static bool FileExists(const char* file)
+static int FileExists(const char* restrict file)
 {
     FILE* fp;
     if (!(fp = fopen(file, "rb")))
     {
-        return false;
+        return 0;
     }
     
-    return true;
+    return 1;
 }
 
-const char* InsertSpacing(int shiftwidth)
+const char* InsertSpacing(unsigned shiftwidth)
 {
-    if (shiftwidth == 0) { return ""; }
+    if (shiftwidth == 0)
+    {
+        return NULL;
+    }
 
-    const int k = 4;
-    const int depth = k * shiftwidth;
+    const unsigned k = 4;
+    const unsigned depth = k * shiftwidth;
     char* string = (char *)malloc(sizeof(char) * depth);
 
-    int i = 0;
+    unsigned i = 0;
     for (i = 0; i < depth; i++)
     {
         string[i] = ' ';
@@ -34,10 +36,10 @@ const char* InsertSpacing(int shiftwidth)
     return string;
 }
 
-int LogEvent(Injector* injector, const char* event, int shiftwidth)
+int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth)
 {
     int bytesWritten        = 0;
-    unsigned int verbosity  = injector->verbosity;
+    int verbosity           = injector->verbosity;
     const char* output_file = injector->output_file;
 
     FILE* fp = NULL;

@@ -7,6 +7,7 @@
 *.exe
 *.dll
 *.lib
+*.zip
 
 # Exclude directories
 .vs

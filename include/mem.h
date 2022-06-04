@@ -1,11 +1,11 @@
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef MEM_HEADER
+#define MEM_HEADER
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
 #include <windows.h>
-#endif
+#endif /* VC_EXTRA_LEAN */
 
-DWORD GetProcessIdByProcessName(const char* process_name);
+DWORD GetProcessIdByProcessName(const char* restrict process_name);
 
-#endif /* _MEM_H */
+#endif /* MEM_HEADER */

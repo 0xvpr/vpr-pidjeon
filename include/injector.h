@@ -1,19 +1,20 @@
-#ifndef _INJECTOR_H
-#define _INJECTOR_H
+#ifndef INJECTOR_HEADER
+#define INJECTOR_HEADER
 
 #include "definitions.h"
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
 #include <windows.h>
 #include <tlhelp32.h>
-#endif
+#endif /* VC_EXTRA_LEAN */
 
-DWORD GetProcessIdByProcessName(const char* process_name);
+DWORD GetProcessIdByProcessName(const char* restrict process_name);
 
-int inject_ManualMap(DWORD process_id, const char* dll_path);
+unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path);
 
-void InjectPayload(Resource* pResource, Injector* pInjector);
+void InjectPayload(Resource* pResource, Injector* restrict pInjector);
 
 void __handle_error(int error_code);
 
-#endif /* _INJECTOR_H */
+#endif /* INJECTOR_HEADER */

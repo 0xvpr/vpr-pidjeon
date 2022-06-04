@@ -1,14 +1,15 @@
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef UTIL_HEADER
+#define UTIL_HEADER
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
 #include <windows.h>
-#endif
-#include <stdbool.h>
+#endif // VC_EXTRA_LEAN
 
-void __usage_error(const char* msg, char* argv_0);
+void __usage_error(const char* restrict msg, char* restrict argv_0);
 
-bool DllPathIsValid(TCHAR full_path[260]);
+int DllPathIsValid(char* restrict full_path);
 
-#endif /* _UTIL_H */
+int GetArchitechture(char* restrict full_path);
+
+#endif /* UTIL_HEADER */

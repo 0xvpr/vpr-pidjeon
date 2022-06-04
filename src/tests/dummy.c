@@ -14,12 +14,12 @@ S s = { constant };
 
 int main(void)
 {
-    fprintf(stdout, "address of value_to_change = 0x%-6p\n", &(s.value_to_change));
+    fprintf(stdout, "address of value_to_change = 0x%-6p\n", (void *)&(s.value_to_change));
 
     FILE* fp = NULL;
     if ((fp = fopen("temp.txt", "w")))
     {
-        fprintf(fp, "0x%-6p", &(s.value_to_change));
+        fprintf(fp, "0x%-6p", (void *)&(s.value_to_change));
         fclose(fp);
     }
 

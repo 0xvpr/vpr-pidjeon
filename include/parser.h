@@ -1,8 +1,8 @@
-#ifndef _PARSER_H
-#define _PARSER_H
+#ifndef PARSER_HEADER
+#define PARSER_HEADER
 
 #include "definitions.h"
 
-int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector);
+int ParseCommandLine(int argc, char** argv, Resource* restrict pResource, Injector* restrict pInjector);
 
-#endif /* _PARSER_H */
+#endif /* PARSER_HEADER */

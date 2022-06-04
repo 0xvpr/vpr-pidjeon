@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         fprintf(stdout, "%s\n", full_path);
     }
 
-    GetArchitechture(full_path);
+    arch = GetArchitechture(full_path);
     switch (arch)
     {
         case -1:

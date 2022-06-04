@@ -13,10 +13,8 @@ payload into a target process.
 ```bash
 git clone https://github.com/0xvpr/Pidjeon
 cd Pidjeon
-chmod +x ./resources/build-image.sh
-chmod +x ./resources/run-image.sh
-./resources/build-image.sh
-./resources/run-image.sh
+chmod +x ./env/docker-buld.sh ./env/docker-run.sh
+./env/docker-buld.sh && ./env/docker-run.sh
 ```
 
 ## Usage
@@ -32,17 +30,30 @@ chmod +x ./resources/run-image.sh
 - SWITCH: -v -> specify verbosity level
 
 ### Examples
+#### Powershell
 Standard LoadLibraryA injection:
 ```powershell
-./payload_injector_x86.exe explorer.exe test_payload.dll
+./vpr-pidjeon.exe explorer.exe test_payload.dll
 ```
 Silent Manual Map injection after 850 millisecond delay, output to out.txt using Stealth level 3:
 ```powershell
-./payload_injector_x86.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
+./vpr-pidjeon.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
 ```
 TODO Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
 ```powershell
-./payload_injector_x86.exe explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
+./vpr-pidjeon.exe explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
+```
+#### WSL2/MSYS
+```bash
+vpr-pidjeon explorer.exe test_payload.dll
+```
+Silent Manual Map injection after 850 millisecond delay, output to out.txt using Stealth level 3:
+```bash
+vpr-pidjeon explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
+```
+TODO Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
+```bash
+vpr-pidjeon explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
 ```
 
 ## Building

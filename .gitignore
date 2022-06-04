@@ -2,17 +2,18 @@
 *.a
 *.o
 *.so
+*.dll
+*.exe
+*.lib
 *.obj
 *.out
-*.exe
-*.dll
-*.lib
 *.zip
 
 # Exclude directories
 .vs
 bin
 out
+venv
 build
 
 # Exclude log files

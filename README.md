@@ -30,17 +30,30 @@ chmod +x ./env/docker-buld.sh ./env/docker-run.sh
 - SWITCH: -v -> specify verbosity level
 
 ### Examples
+#### Powershell
 Standard LoadLibraryA injection:
 ```powershell
-./payload_injector_x86.exe explorer.exe test_payload.dll
+./vpr-pidjeon.exe explorer.exe test_payload.dll
 ```
 Silent Manual Map injection after 850 millisecond delay, output to out.txt using Stealth level 3:
 ```powershell
-./payload_injector_x86.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
+./vpr-pidjeon.exe explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
 ```
 TODO Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
 ```powershell
-./payload_injector_x86.exe explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
+./vpr-pidjeon.exe explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
+```
+#### WSL2/MSYS
+```bash
+vpr-pidjeon explorer.exe test_payload.dll
+```
+Silent Manual Map injection after 850 millisecond delay, output to out.txt using Stealth level 3:
+```bash
+vpr-pidjeon explorer.exe test_payload.dll -s -i ManualMap -d 850 -o out.txt -S 3
+```
+TODO Create remote thread using bytes from shellcode.txt at code cave address 0xDEADBEEF using Stealth level 3:
+```bash
+vpr-pidjeon explorer.exe shellcode.txt -r --cave 0xDEADBEEF -S 3
 ```
 
 ## Building

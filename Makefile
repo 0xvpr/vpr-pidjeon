@@ -45,9 +45,12 @@ install: wrapper x64 x86
 	cp $(BIN)/$(PROJECT)-x64.exe $(BIN)/$(PROJECT)-x64
 	cp $(BIN)/$(PROJECT).exe $(BIN)/$(PROJECT)
 	install -d $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)-x86 $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)-x64 $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)     $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x86.exe $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x64.exe $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT).exe     $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x86     $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)-x64     $(PREFIX)/bin
+	install -m 555 $(BIN)/$(PROJECT)         $(PREFIX)/bin
 	rm $(BIN)/$(PROJECT)-x86
 	rm $(BIN)/$(PROJECT)-x64
 	rm $(BIN)/$(PROJECT)

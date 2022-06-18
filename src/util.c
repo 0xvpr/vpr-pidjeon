@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef BOOL (WINAPI * IsWow64Process2_t)(HANDLE, USHORT*, USHORT*);
+IsWow64Process2_t fIsWow64Process2;
+
 void __usage_error(const char* restrict msg, char* argv_0)
 {
     fprintf(stderr,
@@ -55,51 +58,53 @@ void __handle_error(unsigned inject_code)
 
 int DllPathIsValid(char* restrict full_path)
 {
-    FILE* fp;
-    if (fopen_s(&fp, TEXT(full_path), "rb"))
+    char path_buffer[MAX_PATH] = { 0 };
+    for (unsigned i = 0; i < MAX_PATH; ++i)
     {
-        fclose(fp);
+        path_buffer[i] = full_path[i];
+    }
+
+    FILE* fp;
+    if (!(fp = fopen( path_buffer, "rb")))
+    {
+        fprintf(stderr, "invalid path: %s?\n", path_buffer);
         return 0;
     }
 
+    fclose(fp);
     return 1;
 }
 
-int GetArchitechture(char* restrict file_path)
+int GetArchitechture(HANDLE hProcess)
 {
-    FILE* fp;
-    Pe32FullHeader header = { 0 };
+    unsigned short pHostMachine;
+    unsigned short pProcessMachine;
 
-    if (!(fp = fopen(file_path, "rb")))
+    fIsWow64Process2 = (IsWow64Process2_t)GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process2");
+    if (!fIsWow64Process2)
     {
-        fprintf(stderr, "Failed to open: %s\n", file_path);
+        fprintf(stderr, "Failed to load IsWow64Process2\n");
+        return -1;
+    }
+    else
+    {
+        fprintf(stdout, "fIsWow64Process2 found: %p\n", (void *)fIsWow64Process2);
+    }
+
+    if (!fIsWow64Process2(hProcess, &pProcessMachine, &pHostMachine))
+    {
+        fprintf(stderr, "Failed to detect architecture\n");
         return -1;
     }
 
-    fseek(fp, 0, SEEK_SET);
-    if (!fread((void *)&header, sizeof(header), 1, fp))
+    if ((pProcessMachine) & IMAGE_FILE_32BIT_MACHINE)
     {
-        fprintf(stderr, "Failed to read: %s\n", file_path);
-        fclose(fp);
-        return -1;
-    }
-    fclose(fp);
-
-    if (header.msDosStub.mMagic != *(uint16_t *)"MZ")
-    {
-        fprintf(stderr, "File does not start with magic bits 'MZ': %s\n", file_path);
-        return 0;
-    }
-
-    if (header.pe32PlusOptionalHeader.mMagic == 0x010b)
-    {
-        fprintf(stdout, "%s\n", "PE32 detected.");
+        fprintf(stdout, "PE32 detected\n");
         return 1;
     }
-
-    if (header.pe32PlusOptionalHeader.mMagic == 0x020b)
+    else
     {
-        fprintf(stdout, "%s\n", "PE32+ detected.");
+        fprintf(stdout, "PE32+ detected\n");
         return 2;
     }
 

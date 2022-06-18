@@ -43,11 +43,11 @@ int main(int argc, char** argv)
         }
 
         GetModuleFileNameExA(p, NULL, full_path, MAX_PATH);
-        CloseHandle(p);
         fprintf(stdout, "%s\n", full_path);
     }
 
-    arch = GetArchitechture(full_path);
+    arch = GetArchitechture(p);
+    CloseHandle(p);
     switch (arch)
     {
         case -1:

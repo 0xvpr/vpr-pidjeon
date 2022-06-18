@@ -5,7 +5,7 @@
 
 unsigned inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
 {
-    if (process_id == 0)
+    if (!process_id) 
     {
         return PROCESS_NOT_RUNNING;
     }
@@ -13,7 +13,7 @@ unsigned inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
     TCHAR full_dll_path[MAX_PATH];
     GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
 
-    if (DllPathIsValid(full_dll_path) != 0)
+    if (!(DllPathIsValid((char *)dll)) || !DllPathIsValid(full_dll_path))
     {
         return DLL_DOES_NOT_EXIST;
     }
@@ -24,7 +24,7 @@ unsigned inject_LoadLibraryA(DWORD process_id, const char* restrict dll)
         return INJECTION_FAILED;
     }
 
-    HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
+    HANDLE process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, process_id);
     if (!process_handle)
     {
         return INJECTION_FAILED;
@@ -68,9 +68,9 @@ unsigned inject_LoadLibraryW(DWORD process_id, const char* restrict dll)
     TCHAR full_dll_path[MAX_PATH];
     GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
 
-    if (DllPathIsValid(full_dll_path) != 0)
+    if (!(DllPathIsValid((char *)dll)) || !DllPathIsValid(full_dll_path))
     {
-        return INJECTION_FAILED;
+        return DLL_DOES_NOT_EXIST;
     }
 
     LPVOID pLoadLibraryW = (LPVOID)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryW");

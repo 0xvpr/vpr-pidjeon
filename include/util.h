@@ -10,6 +10,6 @@ void __usage_error(const char* restrict msg, char* restrict argv_0);
 
 int DllPathIsValid(char* restrict full_path);
 
-int GetArchitechture(char* restrict full_path);
+int GetArchitechture(HANDLE restrict hProcess);
 
 #endif /* UTIL_HEADER */

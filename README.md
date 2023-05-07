@@ -1,4 +1,5 @@
 <img src="./res/Banner.png"></img>
+![Build and Test](https://github.com/0xvpr/vpr-pidjeon/actions/workflows/build.yml/badge.svg)
 
 **Pidjeon**, a mash of the words PID (process ID) and injection, is a command  
 line application for Windows that uses various techniques to inject a specified  
@@ -9,15 +10,15 @@ payload into a target process.
 ## Demonstration
 [ embed a demo ]
 
-## Load Environment (Requires Docker)
-### Container Instance
+## Load Environment (preferred build method)
+### Docker Container Instance
 ```bash
 # using WSL2
 git clone https://github.com/0xvpr/vpr-pidjeon
 cd vpr-pidjeon
 make docker-container && make-instance
 ```
-### Container Build
+### Docker Container Build
 ```
 # using WSL2
 git clone https://github.com/0xvpr/vpr-pidjeon

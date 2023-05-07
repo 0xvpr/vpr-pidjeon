@@ -38,7 +38,8 @@ ALL_TARGETS        := $(PIDJEON_TARGET).exe\
                       $(PAYLOAD_TARGET)-x86.dll\
                       $(PAYLOAD_TARGET)-x64.dll\
                       $(DUMMY_TARGET)-x86.exe\
-                      $(DUMMY_TARGET)-x64.exe
+                      $(DUMMY_TARGET)-x64.exe\
+                      run-tests.exe
 
 
 all: $(ALL_TARGETS)

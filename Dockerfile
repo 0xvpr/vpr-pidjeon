@@ -35,3 +35,8 @@ RUN chsh -s /bin/zsh $(whoami)
 # Create working environment
 ENV HOME=/root
 WORKDIR /var/vpr-pidjeon-dev/vpr-pidjeon
+
+# Install CUnit
+RUN mkdir -p ~/downloads
+RUN wget --no-check-certificate https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-cunit-2.1.3-3-any.pkg.tar.xz -O ~/downloads/mingw-w64-x86_64-cunit-2.1.3-3-any.pkg.tar.xz
+RUN tar -xf ~/downloads/mingw-w64-x86_64-cunit-2.1.3-3-any.pkg.tar.xz -C /usr/local/share

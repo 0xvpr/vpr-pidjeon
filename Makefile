@@ -52,7 +52,7 @@ $(PROJECT_OBJECT_DIR)/x64: $(shell find . -name "CMakeLists.txt")
 
 
 .PHONY: docker-container
-container: Dockerfile
+docker-container:
 	docker build -f "Dockerfile" -t "$(PROJECT)-dev" .
 .PHONY: docker-instance
 docker-instance:

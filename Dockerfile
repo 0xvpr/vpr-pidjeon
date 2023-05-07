@@ -34,4 +34,4 @@ RUN chsh -s /bin/zsh $(whoami)
 
 # Create working environment
 ENV HOME=/root
-WORKDIR /var/pidjeon-dev/pidjeon
+WORKDIR /var/vpr-pidjeon-dev/vpr-pidjeon

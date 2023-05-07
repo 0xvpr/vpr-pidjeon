@@ -4,11 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
 #include <windows.h>
 #include <psapi.h>
-#endif /* VC_EXTRA_LEAN */
 
 // TODO: Validate process
 // TODO: Validate DLL path
@@ -43,11 +40,11 @@ int main(int argc, char** argv)
         }
 
         GetModuleFileNameExA(p, NULL, full_path, MAX_PATH);
-        CloseHandle(p);
         fprintf(stdout, "%s\n", full_path);
     }
 
-    arch = GetArchitechture(full_path);
+    arch = GetArchitechture(p);
+    CloseHandle(p);
     switch (arch)
     {
         case -1:

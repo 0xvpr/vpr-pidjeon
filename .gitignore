@@ -1,13 +1,13 @@
 # Exclude compiled files
-*.a
-*.o
-*.so
-*.dll
-*.exe
-*.lib
-*.obj
-*.out
-*.zip
+**/*.a
+**/*.o
+**/*.so
+**/*.dll
+**/*.exe
+**/*.lib
+**/*.obj
+**/*.out
+**/*.zip
 
 # Exclude directories
 .vs
@@ -17,15 +17,8 @@ venv
 build
 
 # Exclude log files
-test_log.txt
-log.txt
+**/*.log
 temp.txt
-CUnit_log.txt
-
-# Exclude bash
-.profile
-.bash_history
-.viminfo
 
 # Exclude Image Files
 *.psd

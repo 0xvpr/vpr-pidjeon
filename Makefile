@@ -1,73 +1,78 @@
-PROJECT     = vpr-pidjeon
-VERSION     = 0.4
+PROJECT             = vpr-pidjeon
 
-CMAKE       = cmake
-TOOLCHAIN   = -DCMAKE_TOOLCHAIN_FILE="mingw-toolchain.cmake"
-TOOLCHAIN64 = -DCMAKE_TOOLCHAIN_FILE="mingw64-toolchain.cmake"
-CMAKE_FLAGS = -j$(shell nproc)
+CMAKE               = /bin/cmake
+CMAKE_SOURCES      := $(shell find . -name "CMakeLists.txt")
+CMAKE_TOOLCHAIN    := $(addprefix ./,mingw-toolchain.cmake)
 
-BIN         = bin
-BUILD       = build
-SOURCE      = src
-INCLUDE     = include
-TEST        = src/test
 
-SOURCES     = $(wildcard $(SOURCE)/*.c)
-OBJECTS     = $(patsubst $(SOURCE)/%.c,$(BUILD)/CMakeFiles/$(PROJECT).dir/$(SOURCE)/%.c.o,$(SOURCES))
+PROJECT_SOURCE_DIR := $(addprefix ./,src)
+PROJECT_OBJECT_DIR := $(addprefix ./,build)
+PROJECT_BIN_DIR    := $(addprefix ./,bin)
+PROJECT_LIB_DIR    := $(addprefix ./,lib)
 
-ifeq ($(PREFIX),)
-PREFIX    = /usr/local
-endif
 
-all: $(PROJECT)
-release: $(PROJECT)
-$(PROJECT): wrapper x64 x86
+PIDJEON_NAME        = pidjeon
+PIDJEON_TARGET     := $(PROJECT_BIN_DIR)/$(PROJECT)
+PIDJEON_PARENT_DIR := $(PROJECT_SOURCE_DIR)/$(PIDJEON_NAME)
+PIDJEON_SOURCE_DIR := $(PIDJEON_PARENT_DIR)/src
+PIDJEON_SOURCES    := $(wildcard $(PIDJEON_SOURCE_DIR)/*.c)
 
-wrapper:
-	$(CMAKE) -B $(BUILD)/Wrapper $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) --build $(BUILD)/Wrapper $(CMAKE_FLAGS)
+PAYLOAD_NAME        = payload
+PAYLOAD_TARGET     := $(PROJECT_LIB_DIR)/$(PAYLOAD_NAME)
+PAYLOAD_PARENT_DIR := $(PROJECT_SOURCE_DIR)/$(PAYLOAD_NAME)
+PAYLOAD_SOURCE_DIR := $(PAYLOAD_PARENT_DIR)/src
+PAYLOAD_SOURCES    := $(wildcard $(PAYLOAD_SOURCE_DIR)/*.c)
 
-x64: CMakeLists.txt
-	$(CMAKE) -B $(BUILD)/x64 $(TOOLCHAIN64) -DARCH="x64"
-	$(CMAKE) --build $(BUILD)/x64 $(CMAKE_FLAGS)
+DUMMY_NAME          = dummy
+DUMMY_TARGET       := $(PROJECT_BIN_DIR)/$(DUMMY_NAME)
+DUMMY_PARENT_DIR   := $(PROJECT_SOURCE_DIR)/$(DUMMY_NAME)
+DUMMY_SOURCE_DIR   := $(DUMMY_PARENT_DIR)/src
+DUMMY_SOURCES      := $(wildcard $(DUMMY_SOURCE_DIR)/*.c)
 
-x86: CMakeLists.txt
-	$(CMAKE) -B $(BUILD)/x86 $(TOOLCHAIN) -DARCH="x86"
-	$(CMAKE) --build $(BUILD)/x86 $(CMAKE_FLAGS)
 
-.PHONY: $(OBJECTS)
-CMakeLists.txt: $(OBJECTS)
-	make clean
+ALL_SOURCES        := $(PIDJEON_SOURCES) $(PAYLOAD_SOURCES) $(DUMMY_SOURCES)
+ALL_OBJECTS        := $(PROJECT_OBJECT_DIR)/x86 $(PROJECT_OBJECT_DIR)/x64
+ALL_TARGETS        := $(PIDJEON_TARGET).exe\
+                      $(PIDJEON_TARGET)-x86.exe\
+                      $(PIDJEON_TARGET)-x64.exe\
+                      $(PAYLOAD_TARGET)-x86.dll\
+                      $(PAYLOAD_TARGET)-x64.dll\
+                      $(DUMMY_TARGET)-x86.exe\
+                      $(DUMMY_TARGET)-x64.exe\
+                      run-tests.exe
 
-.PHONY: install
-install: wrapper x64 x86
-	cp $(BIN)/$(PROJECT)-x86.exe $(BIN)/$(PROJECT)-x86
-	cp $(BIN)/$(PROJECT)-x64.exe $(BIN)/$(PROJECT)-x64
-	cp $(BIN)/$(PROJECT).exe $(BIN)/$(PROJECT)
-	install -d $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)-x86 $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)-x64 $(PREFIX)/bin
-	install -m 555 $(BIN)/$(PROJECT)     $(PREFIX)/bin
-	rm $(BIN)/$(PROJECT)-x86
-	rm $(BIN)/$(PROJECT)-x64
-	rm $(BIN)/$(PROJECT)
 
-.PHONY: release
-release:
-	zip $(PROJECT)-$(VERSION).zip $(BIN)/$(PROJECT)-x86.exe $(BIN)/$(PROJECT)-x64.exe $(BIN)/$(PROJECT).exe
+all: $(ALL_TARGETS)
 
+$(ALL_TARGETS): $(ALL_SOURCES) | $(ALL_OBJECTS)
+	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86
+	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x64
+
+$(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
+	$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x86
+
+$(PROJECT_OBJECT_DIR)/x64: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
+	$(CMAKE) -DPROJECT_ARCHITECTURE="x64" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x64
+
+
+.PHONY: docker-container
+docker-container:
+	docker build -f "Dockerfile" -t "$(PROJECT)-dev" .
+.PHONY: docker-instance
+docker-instance:
+	docker run -itv "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev"
+.PHONY: docker-build
+docker-build:
+	docker run -v "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev" make
+
+
+.PHONY: clean
 clean:
-	rm -fr ./bin/*
-	rm -fr ./lib/*
-	rm -fr ./build/*
-	rm -f ./*.zip
-	rm -f ./*log.txt
-	rm -f ./temp.txt
-
+	rm -fr `find ./bin -name "*.exe"`
+	rm -fr `find ./lib -name "*.dll"`
+	rm -fr `find ./build -name "*.o"`
+.PHONY: extra-clean
 extra-clean:
 	rm -fr ./bin
 	rm -fr ./lib
 	rm -fr ./build
-	rm -f ./*.zip
-	rm -f ./*log.txt
-	rm -f ./temp.txt

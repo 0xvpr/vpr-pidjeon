@@ -1,14 +1,14 @@
 # Creator:    VPR
 # Created:    February 20th, 2022
-# Updated:    June 3rd, 2022
+# Updated:    May 6th, 2023
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Set env to avoid user input interruption during installation
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install normal goodies
+# install normal goodies
 RUN apt-get update && apt upgrade -y
 RUN apt-get install -y --no-install-recommends \
     zsh \
@@ -26,6 +26,7 @@ RUN apt-get install -y --no-install-recommends \
     mingw-w64-tools \
     mingw-w64-x86-64-dev \
     mingw-w64 \
+    python3 \
     gdb
 
 # Change login shell to zsh
@@ -33,7 +34,7 @@ RUN chsh -s /bin/zsh $(whoami)
 
 # Create working environment
 ENV HOME=/root
-WORKDIR /var/pidjeon-dev/pidjeon
+WORKDIR /var/vpr-pidjeon-dev/vpr-pidjeon
 
 # Install CUnit
 RUN mkdir -p ~/downloads

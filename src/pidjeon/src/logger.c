@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 
-static int FileExists(const char* restrict file)
+static inline int __attribute__((always_inline)) FileExists(const char* restrict file)
 {
     FILE* fp;
     if (!(fp = fopen(file, "rb")))
@@ -15,7 +15,7 @@ static int FileExists(const char* restrict file)
     return 1;
 }
 
-const char* InsertSpacing(unsigned shiftwidth)
+char* InsertSpacing(unsigned shiftwidth, char* buffer, size_t size)
 {
     if (shiftwidth == 0)
     {
@@ -24,16 +24,19 @@ const char* InsertSpacing(unsigned shiftwidth)
 
     const unsigned k = 4;
     const unsigned depth = k * shiftwidth;
-    char* string = (char *)malloc(sizeof(char) * depth);
 
-    unsigned i = 0;
-    for (i = 0; i < depth; i++)
+    for (unsigned i = 0; i < size; ++i)
     {
-        string[i] = ' ';
+        buffer[i] = 0;
     }
-    string [i] = '\0';
 
-    return string;
+
+    for (unsigned i = 0; i < depth && i < size; i++)
+    {
+        buffer[i] = ' ';
+    }
+
+    return buffer;
 }
 
 int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth)
@@ -41,6 +44,7 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
     int bytesWritten        = 0;
     int verbosity           = injector->verbosity;
     const char* output_file = injector->output_file;
+    char buffer[256]        = { 0 };
 
     FILE* fp = NULL;
     if (!FileExists(output_file))
@@ -81,7 +85,7 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
         char prefix[64] = { 0 };
         strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
         
-        bytesWritten += fprintf(fp, "%s%s %s.\n", InsertSpacing(shiftwidth), prefix, event);
+        bytesWritten += fprintf(fp, "%s%s %s.\n", InsertSpacing(shiftwidth, buffer, sizeof(buffer)), prefix, event);
         fclose(fp);
     }
     else

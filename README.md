@@ -1,4 +1,5 @@
-<img src="./resources/Banner.png"></img>
+<img src="./res/Banner.png"></img>
+![Build and Test](https://github.com/0xvpr/vpr-pidjeon/actions/workflows/build.yml/badge.svg)
 
 **Pidjeon**, a mash of the words PID (process ID) and injection, is a command  
 line application for Windows that uses various techniques to inject a specified  
@@ -9,18 +10,27 @@ payload into a target process.
 ## Demonstration
 [ embed a demo ]
 
-## Environment (Requires Docker)
+## Load Environment (preferred build method)
+### Docker Container Instance
 ```bash
-git clone https://github.com/0xvpr/Pidjeon
-cd Pidjeon
-chmod +x ./env/docker-buld.sh ./env/docker-run.sh
-./env/docker-buld.sh && ./env/docker-run.sh
+# using WSL2
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
+make docker-container && make-instance
+```
+### Docker Container Build
+```
+# using WSL2
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
+make docker-container && make-instance
 ```
 
 ## Usage
 ### Primary Features
 - [x] DLL injection
 - [x] Remote thread injection & execution
+- [x] Shellcode injection
 
 ### Switches/Usage
 - SWITCH: -i [ LoadLibraryA | LoadLibraryW | ManualMap ] -\> specify the injection method
@@ -28,6 +38,8 @@ chmod +x ./env/docker-buld.sh ./env/docker-run.sh
 - SWITCH: -o --output \<path/to/output\> -\> specify log file location
 - SWITCH: -r --remote -> specify remote thread routine
 - SWITCH: -v -> specify verbosity level
+- SWITCH: -c -> create a remote thread using second positional argument
+
 
 ### Examples
 #### Powershell
@@ -67,9 +79,4 @@ make # makes release binaries by default
 make.exe # makes release binaries by default
 ```
 
-### TODO
-- [ ] Improve DLL injection statuses
-- [ ] Improve DLL injection verification
-- [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave start address
-- [ ] SWITCH: -s --silent -> disable logging
-- [ ] SWITCH: -S --stealth -> specify stealth level
+### [TODO](TODO.md)

@@ -9,11 +9,19 @@ payload into a target process.
 ## Demonstration
 [ embed a demo ]
 
-## Load Docker Environment (Requires Docker)
+## Load Environment (Requires Docker)
+### Container Instance
 ```bash
 # using WSL2
-git clone https://github.com/0xvpr/Pidjeon
-cd Pidjeon
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
+make docker-container && make-instance
+```
+### Container Build
+```
+# using WSL2
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
 make docker-container && make-instance
 ```
 
@@ -70,9 +78,4 @@ make # makes release binaries by default
 make.exe # makes release binaries by default
 ```
 
-### TODO
-- [ ] Improve DLL injection statuses
-- [ ] Improve DLL injection verification
-- [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave start address
-- [ ] SWITCH: -s --silent -> disable logging
-- [ ] SWITCH: -S --stealth -> specify stealth level
+### [TODO](TODO.md)

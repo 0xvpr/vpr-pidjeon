@@ -6,4 +6,4 @@ elseif ( "${PROJECT_ARCHITECTURE}" STREQUAL "x64" )
 endif()
 
 ## Set compile flags
-set( CMAKE_C_FLAGS "-std=c99 -O2 -s -Wall -Wextra -Wshadow -Wpedantic -Wconversion -fno-ident -ffast-math -fvisibility=hidden -funroll-loops -fPIE" )
+set( CMAKE_C_FLAGS "-std=c99 -O2 -s -Wall -Wextra -Wshadow -Wconversion -fno-ident -ffast-math -fvisibility=hidden -funroll-loops -fPIE" )

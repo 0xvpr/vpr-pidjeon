@@ -1,11 +1,14 @@
 PROJECT             = vpr-pidjeon
+
 CMAKE               = /bin/cmake
+CMAKE_SOURCES      := $(shell find . -name "CMakeLists.txt")
+CMAKE_TOOLCHAIN    := $(addprefix ./,mingw-toolchain.cmake)
 
 
-PROJECT_SOURCE_DIR  = ./src
-PROJECT_OBJECT_DIR  = ./build
-PROJECT_BIN_DIR     = ./bin
-PROJECT_LIB_DIR     = ./lib
+PROJECT_SOURCE_DIR := $(addprefix ./,src)
+PROJECT_OBJECT_DIR := $(addprefix ./,build)
+PROJECT_BIN_DIR    := $(addprefix ./,bin)
+PROJECT_LIB_DIR    := $(addprefix ./,lib)
 
 
 PIDJEON_NAME        = pidjeon
@@ -44,11 +47,11 @@ $(ALL_TARGETS): $(ALL_SOURCES) | $(ALL_OBJECTS)
 	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86
 	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x64
 
-$(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt")
-	$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="mingw-toolchain.cmake" -B $(PROJECT_OBJECT_DIR)/x86
+$(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
+	$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x86
 
-$(PROJECT_OBJECT_DIR)/x64: $(shell find . -name "CMakeLists.txt") 
-	$(CMAKE) -DPROJECT_ARCHITECTURE="x64" -DCMAKE_TOOLCHAIN_FILE="mingw-toolchain.cmake" -B $(PROJECT_OBJECT_DIR)/x64
+$(PROJECT_OBJECT_DIR)/x64: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
+	$(CMAKE) -DPROJECT_ARCHITECTURE="x64" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x64
 
 
 .PHONY: docker-container
@@ -56,10 +59,10 @@ docker-container:
 	docker build -f "Dockerfile" -t "$(PROJECT)-dev" .
 .PHONY: docker-instance
 docker-instance:
-	docker run -itv "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" "$(PROJECT)-dev"
-.PHONY: docker-compile
+	docker run -itv "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev"
+.PHONY: docker-build
 docker-build:
-	docker run -v "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" "$(PROJECT)-dev" make
+	docker run -v "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev" make
 
 
 .PHONY: clean

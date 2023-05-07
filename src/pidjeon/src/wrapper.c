@@ -4,11 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
 #include <windows.h>
 #include <psapi.h>
-#endif /* VC_EXTRA_LEAN */
 
 // TODO: Validate process
 // TODO: Validate DLL path

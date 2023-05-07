@@ -5,12 +5,12 @@
 FROM ubuntu:20.04
 
 # Set env to avoid user input interruption during installation
-ENV TZ=America/Chicago
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+env tz=america/chicago
+run ln -snf /usr/share/zoneinfo/$tz /etc/localtime && echo $tz > /etc/timezone
 
-# Install normal goodies
-RUN apt-get update && apt upgrade -y
-RUN apt-get install -y --no-install-recommends \
+# install normal goodies
+run apt-get update && apt upgrade -y
+run apt-get install -y --no-install-recommends \
     zsh \
     zsh-autosuggestions \
     git \

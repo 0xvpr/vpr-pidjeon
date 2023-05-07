@@ -29,6 +29,11 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
         {
             switch (argv[i][1])
             {
+                case 'c':
+                {
+                    *operation = INJECT_CRT;
+                    break;
+                }
                 case 'd':
                 {
                     if (i < argc - 1)

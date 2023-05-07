@@ -1,6 +1,6 @@
-#include <stdio.h>
-
 #include <windows.h>
+
+#include <stdio.h>
 
 uintptr_t address = 0;
 

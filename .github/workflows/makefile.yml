@@ -1,0 +1,19 @@
+name: Makefile CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: build container
+      run: make docker-container
+      
+    - name: build project
+      run: make docker-build

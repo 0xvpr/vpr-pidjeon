@@ -12,31 +12,8 @@ static inline int __attribute__((always_inline)) FileExists(const char* restrict
         return 0;
     }
     
+    fclose(fp);
     return 1;
-}
-
-char* InsertSpacing(unsigned shiftwidth, char* buffer, size_t size)
-{
-    if (shiftwidth == 0)
-    {
-        return NULL;
-    }
-
-    const unsigned k = 4;
-    const unsigned depth = k * shiftwidth;
-
-    for (unsigned i = 0; i < size; ++i)
-    {
-        buffer[i] = 0;
-    }
-
-
-    for (unsigned i = 0; i < depth && i < size; i++)
-    {
-        buffer[i] = ' ';
-    }
-
-    return buffer;
 }
 
 int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth)
@@ -44,12 +21,11 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
     int bytesWritten        = 0;
     int verbosity           = injector->verbosity;
     const char* output_file = injector->output_file;
-    char buffer[256]        = { 0 };
 
     FILE* fp = NULL;
     if (!FileExists(output_file))
     {
-        if ((fp = fopen(output_file, "a")))
+        if ((fp = fopen(output_file, "wb")))
         {
             time_t rawtime = 0;
             struct tm* info = NULL;
@@ -74,7 +50,7 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
         }
     }
 
-    if ((fp = fopen(output_file, "a")))
+    if ((fp = fopen(output_file, "ab")))
     {
         time_t rawtime = 0;
         struct tm* info = NULL;
@@ -85,7 +61,8 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
         char prefix[64] = { 0 };
         strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
         
-        bytesWritten += fprintf(fp, "%s%s %s.\n", InsertSpacing(shiftwidth, buffer, sizeof(buffer)), prefix, event);
+        while (shiftwidth--) fputc(' ', fp);
+        bytesWritten += fprintf(fp, "%s %s.\n", prefix, event);
         fclose(fp);
     }
     else

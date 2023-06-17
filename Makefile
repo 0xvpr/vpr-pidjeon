@@ -1,5 +1,13 @@
 PROJECT             = vpr-pidjeon
 
+ifeq ($(CONFIG),)
+CONFIG              = Debug
+endif
+
+ifeq ($(VERBOSE),1)
+VERBOSE             = --verbose
+endif
+
 CMAKE               = /bin/cmake
 CMAKE_SOURCES      := $(shell find . -name "CMakeLists.txt")
 CMAKE_TOOLCHAIN    := $(addprefix ./,mingw-toolchain.cmake)
@@ -45,8 +53,8 @@ ALL_TARGETS        := $(PIDJEON_TARGET).exe\
 all: $(ALL_TARGETS)
 
 $(ALL_TARGETS): $(ALL_SOURCES) | $(ALL_OBJECTS)
-	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86
-	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x64
+	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86 --config $(CONFIG) $(VERBOSE) 
+	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x64 --config $(CONFIG) $(VERBOSE) 
 
 $(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
 	$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x86

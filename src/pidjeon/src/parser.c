@@ -106,6 +106,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 case 'V':
                 case 'v':
                 {
+                    pInjector->verbosity = 1;
                     break;
                 }
                 case 'r':
@@ -116,7 +117,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 case '-':
                 {
                     char extended_switch[256] = { 0 };
-                    if (1) // TODO: condition
+                    if (1) // TODO
                     {
                         strncpy_s(extended_switch, sizeof(extended_switch), argv[i]+2, sizeof(extended_switch));
                         printf("switch: %s\n", extended_switch);
@@ -132,6 +133,11 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                                 __usage_error("Output file unspecified", argv[0]);
                                 return -1;
                             }
+                            break;
+                        }
+                        else if (!strncmp(extended_switch, "crt", strlen("crt")))
+                        {
+                            pInjector->operation = INJECT_CRT;
                             break;
                         }
                     }

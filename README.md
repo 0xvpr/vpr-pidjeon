@@ -18,24 +18,7 @@ payload into a target process.
 ## Demonstration
 [ TODO ]
 
-## Building
-### Docker Container Live Instance
-```bash
-# using WSL2
-git clone https://github.com/0xvpr/vpr-pidjeon
-cd vpr-pidjeon
-make docker-container && make-instance
-```
-### Docker Container Build
-```
-# using WSL2
-git clone https://github.com/0xvpr/vpr-pidjeon
-cd vpr-pidjeon
-make docker-container && make-build
-```
-
 ## Usage
-### Primary Features
 ```bash
 Error message: Missing positional arguments.
 
@@ -55,4 +38,20 @@ optional arguments:
 
 example:
   vpr-pidjeon.exe calc.exe ./payload.dll -i LoadLibraryA -d 2000
+```
+
+## Building
+### Docker Container Live Instance
+```bash
+# using WSL2
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
+make docker-container && make-instance
+```
+### Docker Container Build
+```
+# using WSL2
+git clone https://github.com/0xvpr/vpr-pidjeon
+cd vpr-pidjeon
+make docker-container && make-build
 ```

@@ -126,8 +126,8 @@ void testPayloadInjector86_UnspecifiedInjector(void)
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x86.exe",
-                                   NULL,
+    bDummyProcess = CreateProcess( NULL,
+                                   "./bin/dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    FALSE,
@@ -146,10 +146,24 @@ void testPayloadInjector86_UnspecifiedInjector(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %d\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
-    BOOL bInjectorProcess64         = 0;
-    bInjectorProcess64 = CreateProcessA( NULL,
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+    BOOL bInjectorProcess32         = 0;
+    bInjectorProcess32 = CreateProcessA( NULL,
                                          injector_args,
                                          NULL,
                                          NULL,
@@ -160,7 +174,7 @@ void testPayloadInjector86_UnspecifiedInjector(void)
                                          &injector_si,
                                          &injector_pi);
 
-    if (!bInjectorProcess64)
+    if (!bInjectorProcess32)
     {
         fprintf(stderr, "Injector process not created.\n");
         CU_ASSERT_FALSE(true);
@@ -186,8 +200,8 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x86.exe",
-                                   NULL,
+    bDummyProcess = CreateProcess( NULL,
+                                   "./bin/dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    FALSE,
@@ -206,10 +220,24 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %d\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
-    BOOL bInjectorProcess64         = 0;
-    bInjectorProcess64 = CreateProcessA( NULL,
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+    BOOL bInjectorProcess32         = 0;
+    bInjectorProcess32 = CreateProcessA( NULL,
                                          injector_args,
                                          NULL,
                                          NULL,
@@ -266,10 +294,24 @@ void testPayloadInjector86_SpecifyLoadLibraryW(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %d\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
-    BOOL bInjectorProcess64         = 0;
-    bInjectorProcess64 = CreateProcessA( NULL,
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+    BOOL bInjectorProcess32         = 0;
+    bInjectorProcess32 = CreateProcessA( NULL,
                                          injector_args,
                                          NULL,
                                          NULL,
@@ -280,7 +322,7 @@ void testPayloadInjector86_SpecifyLoadLibraryW(void)
                                          &injector_si,
                                          &injector_pi);
 
-    if (!bInjectorProcess64)
+    if (!bInjectorProcess32)
     {
         fprintf(stderr, "Injector process not created.\n");
         CU_ASSERT_FALSE(true);
@@ -326,10 +368,24 @@ void testPayloadInjector86_SpecifyManualMap(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %d\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
-    BOOL bInjectorProcess64         = 0;
-    bInjectorProcess64 = CreateProcessA( NULL,
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+    BOOL bInjectorProcess32         = 0;
+    bInjectorProcess32 = CreateProcessA( NULL,
                                          injector_args,
                                          NULL,
                                          NULL,
@@ -339,8 +395,7 @@ void testPayloadInjector86_SpecifyManualMap(void)
                                          NULL,
                                          &injector_si,
                                          &injector_pi);
-
-    if (!bInjectorProcess64)
+    if (!bInjectorProcess32)
     {
         fprintf(stderr, "Injector process not created.\n");
         CU_ASSERT_FALSE(true);

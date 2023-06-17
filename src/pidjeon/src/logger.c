@@ -22,6 +22,11 @@ int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth
     int verbosity           = injector->verbosity;
     const char* output_file = injector->output_file;
 
+    if (verbosity == 1)
+    {
+        return 0;
+    }
+
     FILE* fp = NULL;
     if (!FileExists(output_file))
     {

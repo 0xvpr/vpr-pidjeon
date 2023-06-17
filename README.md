@@ -1,15 +1,15 @@
 <h1 align="center">vpr-pidjeon</h1>
-<br>
 <p align="center">
   <img src="https://img.shields.io/badge/Windows--x86__64-supported-green">
   <img src="https://img.shields.io/badge/Windows--x86-supported-green">
   <img src="https://img.shields.io/badge/Linux--x86__64-unsupported-red">
   <img src="https://img.shields.io/badge/Linux--x86-unsupported-red">
-  <img src="https://img.shields.io/badge/tests-failing-read">
+  <img src="https://img.shields.io/badge/tests-failing-red">
   <a href="https://mit-license.org/">
     <img src="https://img.shields.io/github/license/0xvpr/vpr-pidjeon?style=flat-square">
   </a>
 </p>
+<br>
 
 **pidjeon**, a mash-up of the words PID (process ID) and injection, is a command  
 line application for Windows that uses various techniques to inject a specified  

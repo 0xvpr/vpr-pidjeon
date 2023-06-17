@@ -19,6 +19,7 @@ build
 # Exclude log files
 **/*.log
 temp.txt
+log.txt
 
 # Exclude Image Files
 *.psd

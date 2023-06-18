@@ -1,5 +1,5 @@
-#include "CUnit/Basic.h"
 #include "CUnit/Console.h"
+#include "CUnit/Basic.h"
 
 #include "definitions.h"
 #include "injector.h"
@@ -90,6 +90,64 @@ void test_ParseCommandLine_SpecifyManualMap(void)
     CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
+void test_ParseCommandLine_CreateRemoteThreadShortOption(void)
+{
+    int argc = 4;
+    char* argv[4] = { "injector.exe", "target.exe", "payload.bin", "-r" };
+
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_CRT, ParseCommandLine(argc, argv, &resource, &injector));
+}
+
+void test_ParseCommandLine_CreateRemoteThreadLongOption(void)
+{
+    int argc = 4;
+    char* argv[4] = { "injector.exe", "target.exe", "payload.bin", "--crt" };
+
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    CU_ASSERT_EQUAL(INJECT_CRT, ParseCommandLine(argc, argv, &resource, &injector));
+}
+
+void test_ParseCommandLine_AddDelay1000(void)
+{
+    int argc = 5;
+    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-d", "1000" };
+
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    (void)ParseCommandLine(argc, argv, &resource, &injector);
+    CU_ASSERT_EQUAL(injector.delay_ms, 1000u);
+}
+
+void test_ParseCommandLine_AddDelay100000(void)
+{
+    int argc = 5;
+    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-d", "100000" };
+
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    (void)ParseCommandLine(argc, argv, &resource, &injector);
+    CU_ASSERT_EQUAL(injector.delay_ms, 100000u);
+}
+
+void test_ParseCommandLine_AddDelay100000000(void)
+{
+    int argc = 5;
+    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-d", "100000000" };
+
+    Resource resource = { 0 };
+    Injector injector = { .output_file = "log.txt" };
+
+    (void)ParseCommandLine(argc, argv, &resource, &injector);
+    CU_ASSERT_EQUAL(injector.delay_ms, 100000000u);
+}
+
 void test_LogEvent_CreateLogFile(void)
 {
     int bytesWritten = 0;
@@ -154,25 +212,30 @@ int main(void)
 
     /* add the tests to the suite */
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if ( NULL == CU_add_test( pSuite, "ParseCommandLine(Unspecified) -> LoadLibraryA",      test_ParseCommandLine_UnspecifiedInjector) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryA) -> LoadLibraryA",     test_ParseCommandLine_SpecifyLoadLibraryA) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryW) -> LoadLibraryW",     test_ParseCommandLine_SpecifyLoadLibraryW) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(ManualMap) -> ManualMap",           test_ParseCommandLine_SpecifyManualMap)    ||
-         NULL == CU_add_test( pSuite, "LogEvent() -> Create log file",                      test_LogEvent_CreateLogFile)               ||
-         NULL == CU_add_test( pSuite, "LogEvent() -> Append to log file",                   test_LogEvent_AppendToLogFile)
+    if ( NULL == CU_add_test( pSuite, "ParseCommandLine: Unspecified",     test_ParseCommandLine_UnspecifiedInjector)           ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -i LoadLibraryA", test_ParseCommandLine_SpecifyLoadLibraryA)           ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -i LoadLibraryW", test_ParseCommandLine_SpecifyLoadLibraryW)           ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -i ManualMap",    test_ParseCommandLine_SpecifyManualMap)              ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -r",              test_ParseCommandLine_CreateRemoteThreadShortOption) ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: --crt",           test_ParseCommandLine_CreateRemoteThreadLongOption)  ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -d 1000",         test_ParseCommandLine_AddDelay1000)                  ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -d 100000",       test_ParseCommandLine_AddDelay100000)                ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine: -d 1000000000",   test_ParseCommandLine_AddDelay100000000)             ||
+         NULL == CU_add_test( pSuite, "LogEvent: Create log file",         test_LogEvent_CreateLogFile)                         ||
+         NULL == CU_add_test( pSuite, "LogEvent: Append to log file",      test_LogEvent_AppendToLogFile)
        )
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    // Run tests 
+    /* Run tests */
     CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();      // Run tests automatically
+    CU_basic_run_tests();      /* Run tests automatically */
 
     unsigned fails = CU_get_number_of_failures();
 
-    // CU_console_run_tests(); // Run tests interactively
+    /* CU_console_run_tests(); */ /* Run tests interactively */
     CU_cleanup_registry();
 
     return (fails > 0);

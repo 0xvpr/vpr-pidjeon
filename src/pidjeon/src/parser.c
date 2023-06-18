@@ -36,7 +36,11 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 }
                 case 'd':
                 {
-                    if (i < argc - 1)
+                    if (argv[i][2])
+                    {
+                        sscanf((char *)(argv[i] + 1), "%u", &(pInjector->delay_ms));
+                    }
+                    else if (i < argc - 1)
                     {
                         sscanf(argv[i+1], "%u", &(pInjector->delay_ms));
                     }
@@ -51,7 +55,6 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                         __usage_error("-d switch used incorrectly", argv[0]);
                         return -1;
                     }
-
                     break;
                 }
                 case 'i':
@@ -117,39 +120,31 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 case '-':
                 {
                     char extended_switch[256] = { 0 };
-                    if (1) // TODO
+                    strncpy_s(extended_switch, sizeof(extended_switch), argv[i]+2, sizeof(extended_switch));
+                    if (!strncmp(extended_switch, "output", strlen("output")))
                     {
-                        strncpy_s(extended_switch, sizeof(extended_switch), argv[i]+2, sizeof(extended_switch));
-                        printf("switch: %s\n", extended_switch);
-
-                        if (!strncmp(extended_switch, "output", strlen("output")))
+                        if (i < argc - 1)
                         {
-                            if (i < argc - 1)
-                            {
-                                strncpy_s(pInjector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
-                            }
-                            else
-                            {
-                                __usage_error("Output file unspecified", argv[0]);
-                                return -1;
-                            }
-                            break;
+                            strncpy_s(pInjector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
                         }
-                        else if (!strncmp(extended_switch, "crt", strlen("crt")))
+                        else
                         {
-                            pInjector->operation = INJECT_CRT;
-                            break;
+                            __usage_error("Output file unspecified", argv[0]);
+                            return -1;
                         }
+                        break;
                     }
-                    else
+                    else if (!strncmp(extended_switch, "crt", strlen("crt")))
                     {
-                        __usage_error("Output file unknown", argv[0]);
-                        return -1;
+                        pInjector->operation = INJECT_CRT;
+                        break;
                     }
                     break;
                 }
                 default:
+                {
                     break;
+                }
             }
         }
 

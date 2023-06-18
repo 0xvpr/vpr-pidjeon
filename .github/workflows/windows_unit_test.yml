@@ -5,8 +5,18 @@ on:
     branches: [ "main" ]
 
 jobs:
+  trigger_docker_build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Trigger Docker Build
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          repository: 0xvpr/vpr-pidjeon
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: docker_build
+
   test:
-    needs: docker_build
+    needs: [trigger_docker_build]
     runs-on: windows-latest
 
     steps:

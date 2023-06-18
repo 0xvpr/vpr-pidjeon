@@ -17,7 +17,7 @@ jobs:
 
   test:
     needs: [trigger_docker_build]
-    if: ${{ needs.trigger_docker_build.result == 'success' }}
+    if: ${{ needs.docker_build.result == 'success' }}
     runs-on: windows-latest
 
     steps:

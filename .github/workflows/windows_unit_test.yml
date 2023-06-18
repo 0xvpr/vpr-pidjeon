@@ -22,7 +22,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: binaries
-          path: bin/*
+          path: bin
 
   test:
     needs: docker_build
@@ -39,4 +39,4 @@ jobs:
 
       - name: Run tests with cmd
         run: |
-          ./run-tests.exe
+          ./bin/run-tests.exe

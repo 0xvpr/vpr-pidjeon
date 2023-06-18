@@ -1,0 +1,41 @@
+name: Windows Unit Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  docker_build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build container
+        run: make docker-container
+
+      - name: Build project
+        run: make docker-build
+
+      - name: Transfer binaries to Windows
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: bin
+
+  windows_unit_tests:
+    needs: docker_build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download binaries
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+
+      - name: Execute CUnit unit tests
+        run: ./run-tests.exe

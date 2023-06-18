@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/github/license/0xvpr/vpr-pidjeon?style=flat-square"/>
   </a>
   <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-pidjeon/docker_build.yml?style=flat-square"/>
-  <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-pidjeon/windows_unit_tests.yml?label=tests?style=flat-square"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-pidjeon/windows_unit_tests.yml?label=tests"/>
 </p>
 <br>
 

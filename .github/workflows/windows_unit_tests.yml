@@ -1,4 +1,4 @@
-name: Windows Test
+name: Windows Unit Tests
 
 on:
   pull_request:
@@ -12,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: build container
+      - name: Build container
         run: make docker-container
 
-      - name: build project
+      - name: Build project
         run: make docker-build
 
       - name: Transfer binaries to Windows
@@ -24,7 +24,7 @@ jobs:
           name: binaries
           path: bin
 
-  test:
+  windows_unit_tests:
     needs: docker_build
     runs-on: windows-latest
 
@@ -37,6 +37,5 @@ jobs:
         with:
           name: binaries
 
-      - name: Run tests with cmd
-        run: |
-          ./run-tests.exe
+      - name: Execute CUnit unit tests
+        run: ./run-tests.exe

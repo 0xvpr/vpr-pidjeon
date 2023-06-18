@@ -1,4 +1,5 @@
 # TODO
+- [ ] Add some sort of Jira for project management
 - [ ] Improve DLL injection statuses
 - [ ] Improve DLL injection verification
 - [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave start address

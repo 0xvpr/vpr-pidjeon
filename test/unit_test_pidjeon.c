@@ -770,5 +770,5 @@ int main(void)
     // CU_console_run_tests(); // Run tests interactively
     CU_cleanup_registry();
 
-    return CU_get_error();
+    return (CU_get_number_of_failures() > 0);
 }

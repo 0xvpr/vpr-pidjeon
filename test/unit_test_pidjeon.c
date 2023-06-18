@@ -38,11 +38,11 @@ int clean_suite(void)
 {
     if (fclose(temp_file))
     {
-        remove("cunit.log");
         return -1;
     }
 
   temp_file = NULL;
+  remove("cunit.log");
   return 0;
 }
 
@@ -119,6 +119,7 @@ void testLogEvent_AppendToLogFile(void)
                             0);
 
 
+    FILE* fp;
     if ((fp = fopen(TEST_FILE, "r")))
     {
         fclose(fp);

@@ -24,15 +24,15 @@ jobs:
           name: binaries
           path: bin
 
-  trigger_windows_unit_test:
-    needs: [docker_build]
-    runs-on: ubuntu-22.04
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  #trigger_windows_unit_test:
+    #needs: [docker_build]
+    #runs-on: ubuntu-22.04
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
-    steps:
-      - name: Trigger Windows Test
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          repository: 0xvpr/vpr-pidjeon
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: windows_unit_test
+    #steps:
+      #- name: Trigger Windows Test
+        #uses: peter-evans/repository-dispatch@v2
+        #with:
+          #repository: 0xvpr/vpr-pidjeon
+          #token: ${{ secrets.GITHUB_TOKEN }}
+          #event-type: windows_unit_test

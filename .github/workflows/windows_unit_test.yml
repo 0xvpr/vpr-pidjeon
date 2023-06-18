@@ -1,11 +1,14 @@
 name: Windows Test
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: [ "Docker Build" ]
+    types:
+      - completed
 
 jobs:
   test:
+    needs: docker_build.outputs.uploaded
     runs-on: windows-latest
 
     steps:

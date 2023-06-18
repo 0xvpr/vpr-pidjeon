@@ -14,10 +14,11 @@
 
 static FILE* temp_file = NULL;
 
-/* The suite initialization function.
+/**
+ * The suite initialization function.
  * Opens the temporary file used by the tests.
  * Returns zero on success, non-zero otherwise.
- */
+**/
 int init_suite(void)
 {
     if (NULL == (temp_file = fopen("cunit.log", "w")))
@@ -28,14 +29,16 @@ int init_suite(void)
     return 0;
 }
 
-/* The suite cleanup function.
+/** 
+ * The suite cleanup function.
  * Closes the temporary file used by the tests.
  * Returns zero on success, non-zero otherwise.
- */
+**/
 int clean_suite(void)
 {
-    if (0 != fclose(temp_file))
+    if (fclose(temp_file))
     {
+        remove("cunit.log");
         return -1;
     }
 
@@ -115,6 +118,13 @@ void testLogEvent_AppendToLogFile(void)
                             "Test of LogEvent's append to log file",
                             0);
 
+
+    if ((fp = fopen(TEST_FILE, "r")))
+    {
+        fclose(fp);
+        remove(TEST_FILE);
+    }
+
     CU_ASSERT_TRUE(bytesWritten == 62);
 }
 
@@ -148,7 +158,7 @@ void testPayloadInjector86_UnspecifiedInjector(void)
 
     HANDLE hChildStdoutRd, hChildStdoutWr;
     if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
-        printf("Failed to create pipe: %d\n", GetLastError());
+        printf("Failed to create pipe: %lu\n", GetLastError());
         CU_ASSERT_FALSE(true);
         return;
     }
@@ -222,7 +232,7 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
 
     HANDLE hChildStdoutRd, hChildStdoutWr;
     if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
-        printf("Failed to create pipe: %d\n", GetLastError());
+        printf("Failed to create pipe: %lu\n", GetLastError());
         CU_ASSERT_FALSE(true);
         return;
     }
@@ -248,7 +258,7 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
                                          &injector_si,
                                          &injector_pi);
 
-    if (!bInjectorProcess64)
+    if (!bInjectorProcess32)
     {
         fprintf(stderr, "Injector process not created.\n");
         CU_ASSERT_FALSE(true);
@@ -296,7 +306,7 @@ void testPayloadInjector86_SpecifyLoadLibraryW(void)
 
     HANDLE hChildStdoutRd, hChildStdoutWr;
     if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
-        printf("Failed to create pipe: %d\n", GetLastError());
+        printf("Failed to create pipe: %lu\n", GetLastError());
         CU_ASSERT_FALSE(true);
         return;
     }
@@ -370,7 +380,7 @@ void testPayloadInjector86_SpecifyManualMap(void)
 
     HANDLE hChildStdoutRd, hChildStdoutWr;
     if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
-        printf("Failed to create pipe: %d\n", GetLastError());
+        printf("Failed to create pipe: %lu\n", GetLastError());
         CU_ASSERT_FALSE(true);
         return;
     }
@@ -441,8 +451,22 @@ void testPayloadInjector64_UnspecifiedInjector(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %lu\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
     BOOL bInjectorProcess64         = 0;
     bInjectorProcess64 = CreateProcessA( NULL,
                                          injector_args,
@@ -501,8 +525,22 @@ void testPayloadInjector64_SpecifyLoadLibraryA(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %lu\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
     BOOL bInjectorProcess64         = 0;
     bInjectorProcess64 = CreateProcessA( NULL,
                                          injector_args,
@@ -561,8 +599,22 @@ void testPayloadInjector64_SpecifyLoadLibraryW(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %lu\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
     BOOL bInjectorProcess64         = 0;
     bInjectorProcess64 = CreateProcessA( NULL,
                                          injector_args,
@@ -621,8 +673,22 @@ void testPayloadInjector64_SpecifyManualMap(void)
 
     Sleep(500);
 
+    HANDLE hChildStdoutRd, hChildStdoutWr;
+    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, NULL, 0)) {
+        printf("Failed to create pipe: %lu\n", GetLastError());
+        CU_ASSERT_FALSE(true);
+        return;
+    }
+
     PROCESS_INFORMATION injector_pi = { 0 };
     STARTUPINFO injector_si         = { 0 };
+
+    injector_si.cb = sizeof(STARTUPINFOA);
+    injector_si.dwFlags = STARTF_USESTDHANDLES;
+    injector_si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    injector_si.hStdOutput = hChildStdoutWr; // Redirect stdout to the write end of the pipe
+    injector_si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
     BOOL bInjectorProcess64         = 0;
     bInjectorProcess64 = CreateProcessA( NULL,
                                          injector_args,
@@ -678,10 +744,10 @@ int main(void)
 
     /* add the tests to the suite */
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if ( NULL == CU_add_test( pSuite, "InjectorPayload(Unspecified) -> LoadLibraryA",       testParseCommandLine_UnspecifiedInjector) ||
-         NULL == CU_add_test( pSuite, "InjectPayload(LoadLibraryA) -> LoadLibraryA",        testParseCommandLine_SpecifyLoadLibraryA) ||
-         NULL == CU_add_test( pSuite, "InjectPayload(LoadLibraryW) -> LoadLibraryW",        testParseCommandLine_SpecifyLoadLibraryW) ||
-         NULL == CU_add_test( pSuite, "InjectPayload(ManualMap) -> ManualMap",              testParseCommandLine_SpecifyManualMap) ||
+    if ( NULL == CU_add_test( pSuite, "ParseCommandLine(Unspecified) -> LoadLibraryA",      testParseCommandLine_UnspecifiedInjector) ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryA) -> LoadLibraryA",     testParseCommandLine_SpecifyLoadLibraryA) ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryW) -> LoadLibraryW",     testParseCommandLine_SpecifyLoadLibraryW) ||
+         NULL == CU_add_test( pSuite, "ParseCommandLine(ManualMap) -> ManualMap",           testParseCommandLine_SpecifyManualMap) ||
          NULL == CU_add_test( pSuite, "LogEvent() -> Create log file",                      testLogEvent_CreateLogFile) ||
          NULL == CU_add_test( pSuite, "LogEvent() -> Append to log file",                   testLogEvent_AppendToLogFile) ||
          NULL == CU_add_test( pSuite, "vpr-pidjeon-x86 -> LoadLibraryA",                    testPayloadInjector86_UnspecifiedInjector) ||

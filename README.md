@@ -1,13 +1,13 @@
 <h1 align="center">vpr-pidjeon</h1>
 <p align="center">
-  <img src="https://img.shields.io/badge/Windows--x86__64-supported-green">
-  <img src="https://img.shields.io/badge/Windows--x86-supported-green">
-  <img src="https://img.shields.io/badge/Linux--x86__64-unsupported-red">
-  <img src="https://img.shields.io/badge/Linux--x86-unsupported-red">
-  <a href="https://mit-license.org/">
-    <img src="https://img.shields.io/github/license/0xvpr/vpr-pidjeon?style=flat-square">
+  <img src="https://img.shields.io/badge/Windows--x86__64-supported-green?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Windows--x86-supported-green?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Linux-unsupported-red?style=flat-square"/>
+  <a href="https://mit-license.org/"/>
+    <img src="https://img.shields.io/github/license/0xvpr/vpr-pidjeon?style=flat-square"/>
   </a>
-  <img src="https://img.shields.io/badge/tests-failing-red">
+  <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-pidjeon/makefile.yml?style=flat-square"/>
+  <img src="https://img.shields.io/badge/tests-failing-red?style=flat-square"/>
 </p>
 <br>
 

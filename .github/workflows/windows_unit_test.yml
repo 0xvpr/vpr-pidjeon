@@ -1,20 +1,36 @@
-name: Windows Unit Tests
+name: Windows Test
 
 on:
   pull_request:
     branches: [ "main" ]
-  workflow_run:
-    workflows: ["Docker Build"]
-    types:
-      - completed
 
 jobs:
-  windows_unit_tests:
+  #docker_build:
+    #runs-on: ubuntu-22.04
+
+    #steps:
+      #- name: Checkout code
+        #uses: actions/checkout@v3
+
+      #- name: build container
+        #run: make docker-container
+
+      #- name: build project
+        #run: make docker-build
+
+      #- name: Transfer binaries to Windows
+        #uses: actions/upload-artifact@v3
+        #with:
+          #name: binaries
+          #path: bin
+
+  test:
+    #needs: docker_build
+    uses: ./.github/workflows/docker_build.yml
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' && github.event.workflow_run.event == 'completed' }}
         uses: actions/checkout@v3
 
       - name: Download binaries
@@ -22,5 +38,5 @@ jobs:
         with:
           name: binaries
 
-      - name: Execute CUnit tests
+      - name: Run tests with cmd
         run: ./run-tests.exe

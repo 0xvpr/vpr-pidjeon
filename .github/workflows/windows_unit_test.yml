@@ -5,6 +5,25 @@ on:
     branches: [ "main" ]
 
 jobs:
+  docker_build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: build container
+        run: make docker-container
+
+      - name: build project
+        run: make docker-build
+
+      - name: Transfer binaries to Windows
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: bin/*
+
   test:
     needs: docker_build
     runs-on: windows-latest

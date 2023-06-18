@@ -39,4 +39,4 @@ jobs:
 
       - name: Run tests with cmd
         run: |
-          ./bin/run-tests.exe
+          ./run-tests.exe

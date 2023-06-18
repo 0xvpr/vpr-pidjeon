@@ -131,14 +131,14 @@ void testLogEvent_AppendToLogFile(void)
 
 void testPayloadInjector86_UnspecifiedInjector(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
     bDummyProcess = CreateProcess( NULL,
-                                   "./bin/dummy-x86.exe",
+                                   "./dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    FALSE,
@@ -205,14 +205,14 @@ void testPayloadInjector86_UnspecifiedInjector(void)
 
 void testPayloadInjector86_SpecifyLoadLibraryA(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i LoadLibraryA"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i LoadLibraryA"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
     bDummyProcess = CreateProcess( NULL,
-                                   "./bin/dummy-x86.exe",
+                                   "./dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    FALSE,
@@ -279,13 +279,13 @@ void testPayloadInjector86_SpecifyLoadLibraryA(void)
 
 void testPayloadInjector86_SpecifyLoadLibraryW(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i LoadLibraryW"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i LoadLibraryW"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x86.exe",
+    bDummyProcess = CreateProcess( "./dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -353,13 +353,13 @@ void testPayloadInjector86_SpecifyLoadLibraryW(void)
 
 void testPayloadInjector86_SpecifyManualMap(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i ManualMap"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x86.exe dummy-x86.exe ./lib/payload-x86.dll -i ManualMap"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x86.exe",
+    bDummyProcess = CreateProcess( "./dummy-x86.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -426,13 +426,13 @@ void testPayloadInjector86_SpecifyManualMap(void)
 
 void testPayloadInjector64_UnspecifiedInjector(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x64.exe",
+    bDummyProcess = CreateProcess( "./dummy-x64.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -500,13 +500,13 @@ void testPayloadInjector64_UnspecifiedInjector(void)
 
 void testPayloadInjector64_SpecifyLoadLibraryA(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i LoadLibraryA"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i LoadLibraryA"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x64.exe",
+    bDummyProcess = CreateProcess( "./dummy-x64.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -574,13 +574,13 @@ void testPayloadInjector64_SpecifyLoadLibraryA(void)
 
 void testPayloadInjector64_SpecifyLoadLibraryW(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i LoadLibraryW"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i LoadLibraryW"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x64.exe",
+    bDummyProcess = CreateProcess( "./dummy-x64.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -648,13 +648,13 @@ void testPayloadInjector64_SpecifyLoadLibraryW(void)
 
 void testPayloadInjector64_SpecifyManualMap(void)
 {
-    LPTSTR injector_args = _tcsdup(TEXT("./bin/vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i ManualMap"));
+    LPTSTR injector_args = _tcsdup(TEXT("./vpr-pidjeon-x64.exe dummy-x64.exe ./lib/payload-x64.dll -i ManualMap"));
     DWORD exit_code;
 
     PROCESS_INFORMATION dummy_pi = { 0 };
     STARTUPINFO dummy_si         = { 0 };
     BOOL bDummyProcess           = 0;
-    bDummyProcess = CreateProcess( "./bin/dummy-x64.exe",
+    bDummyProcess = CreateProcess( "./dummy-x64.exe",
                                    NULL,
                                    NULL,
                                    NULL,
@@ -770,5 +770,5 @@ int main(void)
     // CU_console_run_tests(); // Run tests interactively
     CU_cleanup_registry();
 
-    return (CU_get_number_of_failures() > 0);
+    return (CU_get_number_of_failures() == 0);
 }

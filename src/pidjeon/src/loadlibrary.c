@@ -10,7 +10,7 @@ unsigned inject_LoadLibraryA(DWORD process_id, char* restrict dll)
         return PROCESS_NOT_RUNNING;
     }
 
-    TCHAR full_dll_path[MAX_PATH];
+    TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
 
     if (!(DllPathIsValid(dll)) || !DllPathIsValid(full_dll_path))
@@ -65,7 +65,7 @@ unsigned inject_LoadLibraryW(DWORD process_id, char* restrict dll)
         return PROCESS_NOT_RUNNING;
     }
 
-    TCHAR full_dll_path[MAX_PATH];
+    TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
 
     if (!(DllPathIsValid(dll)) || !DllPathIsValid(full_dll_path))
@@ -73,7 +73,7 @@ unsigned inject_LoadLibraryW(DWORD process_id, char* restrict dll)
         return DLL_DOES_NOT_EXIST;
     }
 
-    WCHAR dll_w[MAX_PATH];
+    WCHAR dll_w[MAX_PATH] = { 0 };
     WCHAR full_dll_path_w[MAX_PATH] = { 0 };
 
     for (size_t i = 0; dll[i] != 0; ++i) { dll_w[i] = (WCHAR)dll[i]; }

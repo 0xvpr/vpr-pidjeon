@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif /* VC_EXTRA_LEAN */
 
-unsigned inject_LoadLibraryA(DWORD process_id, const char* restrict dll);
-unsigned inject_LoadLibraryW(DWORD process_id, const char* restrict dll);
+unsigned inject_LoadLibraryA(DWORD process_id, char* restrict dll);
+unsigned inject_LoadLibraryW(DWORD process_id, char* restrict dll);
 
 #endif /* LOAD_LIBRARY_HEADER */

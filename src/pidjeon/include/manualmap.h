@@ -1,16 +1,13 @@
 #ifndef MANUAL_MAP_HEADER
 #define MANUAL_MAP_HEADER
 
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
 #include <windows.h>
-#endif /* VC_EXTRA_LEAN */
 
 typedef FARPROC(__stdcall * pGetProcAddress)(HMODULE, LPCSTR);
 typedef INT(__stdcall * dllmain)(HMODULE, DWORD, LPVOID);
 typedef HMODULE(__stdcall * pLoadLibraryA)(LPCSTR);
 
-typedef struct _loaderdata
+typedef struct _LoaderData
 {
 	LPVOID ImageBase;
 	PIMAGE_NT_HEADERS NtHeaders;
@@ -18,7 +15,7 @@ typedef struct _loaderdata
 	PIMAGE_IMPORT_DESCRIPTOR ImportDirectory;
 	pLoadLibraryA fnLoadLibraryA;
 	pGetProcAddress fnGetProcAddress;
-} loaderdata;
+} LoaderData;
 
 DWORD __stdcall LibraryLoader(LPVOID memory);
 

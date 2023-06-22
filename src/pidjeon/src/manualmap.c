@@ -1,11 +1,9 @@
 #include "manualmap.h"
+
 #include "definitions.h"
 #include "util.h"
 
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
 #include <tlhelp32.h>
-#endif /* VC_EXTRA_LEAN */
 
 #include <string.h>
 #include <stdint.h>
@@ -13,7 +11,7 @@
 
 DWORD __stdcall LibraryLoader(LPVOID memory)
 {
-    loaderdata* LoaderParams = (loaderdata*)memory;
+    LoaderData* LoaderParams = (LoaderData *)memory;
     PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
 
     uintptr_t delta = (uintptr_t)((LPBYTE)LoaderParams->ImageBase - LoaderParams->NtHeaders->OptionalHeader.ImageBase); // Calculate the delta
@@ -22,15 +20,15 @@ DWORD __stdcall LibraryLoader(LPVOID memory)
     {
         if (pIBR->SizeOfBlock >= sizeof(IMAGE_BASE_RELOCATION))
         {
-            int count = (pIBR->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
+            size_t count = (pIBR->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
             PWORD list = (PWORD)(pIBR + 1);
 
-            for (int i = 0; i < count; i++)
+            for (size_t i = 0; i < count; i++)
             {
                 if (list[i])
                 {
                     PDWORD ptr = (PDWORD)((LPBYTE)LoaderParams->ImageBase + (pIBR->VirtualAddress + (list[i] & 0xFFF)));
-                    *ptr += delta;
+                    *ptr += (0xFFFFFFFF) & delta;
                 }
             }
         }
@@ -49,7 +47,9 @@ DWORD __stdcall LibraryLoader(LPVOID memory)
         HMODULE hModule = LoaderParams->fnLoadLibraryA((LPCSTR)LoaderParams->ImageBase + pIID->Name);
 
         if (!hModule)
+        {
             return FALSE;
+        }
 
         while (OrigFirstThunk->u1.AddressOfData)
         {
@@ -60,7 +60,9 @@ DWORD __stdcall LibraryLoader(LPVOID memory)
                     (LPCSTR)(OrigFirstThunk->u1.Ordinal & 0xFFFF));
 
                 if (!Function)
+                {
                     return FALSE;
+                }
 
                 FirstThunk->u1.Function = Function;
             }
@@ -70,7 +72,9 @@ DWORD __stdcall LibraryLoader(LPVOID memory)
                 PIMAGE_IMPORT_BY_NAME pIBN = (PIMAGE_IMPORT_BY_NAME)((LPBYTE)LoaderParams->ImageBase + OrigFirstThunk->u1.AddressOfData);
                 uintptr_t Function = (uintptr_t)LoaderParams->fnGetProcAddress(hModule, (LPCSTR)pIBN->Name);
                 if (!Function)
+                {
                     return FALSE;
+                }
 
                 FirstThunk->u1.Function = Function;
             }
@@ -96,7 +100,7 @@ DWORD __stdcall stub(void)
 
 unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
 {
-    loaderdata LoaderParams;
+    LoaderData LoaderParams;
     TCHAR abs_dll_path[MAX_PATH];
 
     GetFullPathName(dll_path, MAX_PATH, abs_dll_path, NULL);
@@ -144,12 +148,12 @@ unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
     LoaderParams.fnGetProcAddress = GetProcAddress;
 
     // Write the loader information to target process 
-    WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(loaderdata), NULL);
-    WriteProcessMemory(hProcess, (PVOID)((loaderdata*)LoaderMemory + 1), (LPCVOID)LibraryLoader, (uintptr_t)stub - (uintptr_t)LibraryLoader, NULL);
+    WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(LoaderData), NULL);
+    WriteProcessMemory(hProcess, (PVOID)((LoaderData*)LoaderMemory + 1), (LPCVOID)LibraryLoader, (uintptr_t)stub - (uintptr_t)LibraryLoader, NULL);
     
     
     // Create a remote thread to execute the loader code
-    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((loaderdata*)LoaderMemory + 1), LoaderMemory, 0, NULL);
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((LoaderData*)LoaderMemory + 1), LoaderMemory, 0, NULL);
 
     // Wait for the loader to finish executing
     WaitForSingleObject(hThread, INFINITE);

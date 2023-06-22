@@ -29,22 +29,22 @@ void InjectPayload(Resource* restrict data, Injector* restrict pInjector)
     {
         case INJECT_LOAD_LIBRARY_A:
         {
-            pInjector->status = inject_LoadLibraryA((DWORD)data->process_id, data->dll_rel_path);
+            pInjector->status = (0xFF) & inject_LoadLibraryA((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_LOAD_LIBRARY_W:
         {
-            pInjector->status = inject_LoadLibraryW((DWORD)data->process_id, data->dll_rel_path);
+            pInjector->status = (0xFF) & inject_LoadLibraryW((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_MANUAL_MAP:
         {
-            pInjector->status = inject_ManualMap((DWORD)data->process_id, data->dll_rel_path);
+            pInjector->status = (0xFF) & inject_ManualMap((DWORD)data->process_id, data->dll_rel_path);
             break;
         }
         case INJECT_CRT:
         {
-            pInjector->status = InjectExecuteShellcode(data, pInjector);
+            pInjector->status = (0xFF) & InjectExecuteShellcode(data, pInjector);
             break;
         }
         default:

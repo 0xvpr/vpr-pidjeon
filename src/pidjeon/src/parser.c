@@ -1,12 +1,18 @@
 #include "definitions.h"
 #include "parser.h"
 #include "util.h"
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#else
+#include <unistd.h>
+#include <sys/man.h>
 #endif
+
 #include <stdio.h>
 
+#ifndef _WIN32
 int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector)
 {
     int* operation = &(pInjector->operation);
@@ -158,3 +164,25 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
 
     return (*operation == NO_OPERATION ? (pInjector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
 }
+#endif
+
+#ifndef _WIN32
+int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector)
+{
+    int* operation = &(pInjector->operation);
+    int i = argc - 1;
+
+    if (argc < 3)
+    {
+        __usage_error("Missing positional arguments", argv[0]);
+        return -1;
+    }
+    else
+    {
+        strncpy_s(pResource->target_process, MAX_PATH, argv[1], MAX_PATH);
+        strncpy_s(pResource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
+    }
+
+    // Unix ways of parsing the bullshit goes here
+}
+#endif

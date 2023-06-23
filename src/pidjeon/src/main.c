@@ -1,12 +1,18 @@
 /**
- * Author:   VPR
- * Created:  September 14, 2021
- * Modified: November 14, 2021
+ * Creator by:      VPR
+ * Created:         September 14, 2021
+ *
+ * Updated by:      VPR
+ * Updated:         June 22nd, 2023
+ *
+ * Description:     A command line utility capable of injecting arbitrary code into  
+ *                  live running processes via a multitude of techniques.
 **/
 
 #include "definitions.h"
 #include "injector.h"
 #include "parser.h"
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -26,6 +32,7 @@ int main(int argc, char** argv)
     {
         return errno;
     }
+
     InjectPayload(&resource, &injector);
 
     return 0;

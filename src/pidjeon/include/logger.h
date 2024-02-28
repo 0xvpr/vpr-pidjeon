@@ -4,6 +4,7 @@
 #include "definitions.h"
 #include <inttypes.h>
 
-int LogEvent(Injector* injector, const char* restrict event, unsigned shiftwidth);
+int log_basic(const Injector* injector, const char* restrict event, uint32_t shiftwidth);
+int log_advanced(const Injector* injector, const char* restrict event, uint32_t shiftwidth);
 
 #endif /* LOGGER_HEADER */

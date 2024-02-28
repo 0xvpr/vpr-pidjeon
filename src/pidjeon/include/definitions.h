@@ -17,6 +17,8 @@
 #define MAX_PATH              0x00000104
 #endif /* MAX_PATH */
 
+#include <stdint.h>
+
 typedef struct _Resource
 {
     unsigned    process_id;
@@ -26,14 +28,16 @@ typedef struct _Resource
 
 typedef struct _Injector
 {
-    unsigned    status:8;
+    unsigned    status;
     int         operation;
     unsigned    delay_ms;
-    int         remote:1;
-    int         silent:1;
-    int         stealth:1;
-    int         verbosity:2;
+    int         remote;
+    int         silent;
+    int         stealth;
+    int         verbosity;
+    int (* logger)(const struct _Injector* injector, const char* restrict event, uint32_t shiftwidth);
     char        output_file[MAX_PATH];
 } Injector;
+
 
 #endif /* DEFINITIONS_HEADER */

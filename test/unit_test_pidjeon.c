@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define TEST_FILE "test_log.log"
+#define LOG_FILE "test.log"
 
 static FILE* temp_file = NULL;
 
@@ -90,43 +90,52 @@ void test_ParseCommandLine_SpecifyManualMap(void)
     CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
-void test_LogEvent_CreateLogFile(void)
+void test_log_basic_CreateLogFile(void)
 {
     int bytesWritten = 0;
-    Injector injector = { .output_file = TEST_FILE };
+    Injector injector = {
+        .output_file = LOG_FILE,
+        .logger = log_basic
+    };
 
     FILE* fp = NULL;
-    if ((fp = fopen(TEST_FILE, "r")))
+    if ((fp = fopen(LOG_FILE, "r")))
     {
         fclose(fp);
-        remove(TEST_FILE);
+        remove(LOG_FILE);
     }
 
-    bytesWritten = LogEvent(&injector,
-                            "Test of LogEvent's create log file",
-                            0);
+    bytesWritten = injector.logger(
+        &injector,
+        "Test of log_basic's create log file",
+        0
+    );
 
-    CU_ASSERT_TRUE(bytesWritten == 100);
+    CU_ASSERT_TRUE(bytesWritten == 101);
 }
 
-void test_LogEvent_AppendToLogFile(void)
+void test_log_basic_AppendToLogFile(void)
 {
     int bytesWritten = 0;
-    Injector injector = { .output_file = TEST_FILE };
+    Injector injector = {
+        .output_file = LOG_FILE,
+        .logger = log_basic
+    };
 
-    bytesWritten = LogEvent(&injector,
-                            "Test of LogEvent's append to log file",
-                            0);
-
+    bytesWritten = injector.logger(
+        &injector,
+        "Test of log_basic's append to log file",
+        0
+    );
 
     FILE* fp;
-    if ((fp = fopen(TEST_FILE, "r")))
+    if ((fp = fopen(LOG_FILE, "r")))
     {
         fclose(fp);
-        remove(TEST_FILE);
+        remove(LOG_FILE);
     }
 
-    CU_ASSERT_TRUE(bytesWritten == 62);
+    CU_ASSERT_TRUE(bytesWritten == 63);
 }
 
 /**
@@ -158,8 +167,8 @@ int main(void)
          NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryA) -> LoadLibraryA",     test_ParseCommandLine_SpecifyLoadLibraryA) ||
          NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryW) -> LoadLibraryW",     test_ParseCommandLine_SpecifyLoadLibraryW) ||
          NULL == CU_add_test( pSuite, "ParseCommandLine(ManualMap) -> ManualMap",           test_ParseCommandLine_SpecifyManualMap)    ||
-         NULL == CU_add_test( pSuite, "LogEvent() -> Create log file",                      test_LogEvent_CreateLogFile)               ||
-         NULL == CU_add_test( pSuite, "LogEvent() -> Append to log file",                   test_LogEvent_AppendToLogFile)
+         NULL == CU_add_test( pSuite, "log_basic() -> Create log file",                     test_log_basic_CreateLogFile)               ||
+         NULL == CU_add_test( pSuite, "log_basic() -> Append to log file",                  test_log_basic_AppendToLogFile)
        )
     {
         CU_cleanup_registry();

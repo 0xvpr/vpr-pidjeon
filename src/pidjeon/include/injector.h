@@ -15,6 +15,6 @@ unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path);
 
 void InjectPayload(Resource* pResource, Injector* restrict pInjector);
 
-void __handle_error(int error_code);
+void __handle_error(unsigned error_code);
 
 #endif /* INJECTOR_HEADER */

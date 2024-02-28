@@ -1,6 +1,9 @@
 #include "definitions.h"
 #include "parser.h"
+#include "logger.h"
 #include "util.h"
+
+#include <immintrin.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -12,10 +15,10 @@
 
 #include <stdio.h>
 
-#ifndef _WIN32
-int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector)
+#ifdef _WIN32
+int ParseCommandLine(int argc, char** argv, Resource* resource, Injector* injector)
 {
-    int* operation = &(pInjector->operation);
+    int* operation = &(injector->operation);
     int i = argc - 1;
 
     if (argc < 3)
@@ -25,8 +28,8 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
     }
     else
     {
-        strncpy_s(pResource->target_process, MAX_PATH, argv[1], MAX_PATH);
-        strncpy_s(pResource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
+        strncpy_s(resource->target_process, MAX_PATH, argv[1], MAX_PATH);
+        strncpy_s(resource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
     }
 
     while (i > 2)
@@ -44,7 +47,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 {
                     if (i < argc - 1)
                     {
-                        sscanf(argv[i+1], "%u", &(pInjector->delay_ms));
+                        sscanf(argv[i+1], "%u", &(injector->delay_ms));
                     }
                     else
                     {
@@ -52,7 +55,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                         return -1;
                     }
 
-                    if (!pInjector->delay_ms)
+                    if (!injector->delay_ms)
                     {
                         __usage_error("-d switch used incorrectly", argv[0]);
                         return -1;
@@ -93,6 +96,8 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                     if (i < argc - 1)
                     {
                         strncpy_s(arg_to_parse, sizeof(arg_to_parse), argv[i+1], sizeof(arg_to_parse));
+                        __m256i data = _mm256_loadu_si256((__m256i *)arg_to_parse);
+                        _mm256_storeu_si256((__m256i *)(injector->output_file), data);
                     }
                     else
                     {
@@ -112,12 +117,13 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                 case 'V':
                 case 'v':
                 {
-                    pInjector->verbosity = 1;
+                    injector->verbosity = 1;
+                    injector->logger = log_basic;
                     break;
                 }
                 case 'r':
                 {
-                    pInjector->operation = INJECT_CRT;
+                    injector->operation = INJECT_CRT;
                     break;
                 }
                 case '-':
@@ -132,7 +138,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                         {
                             if (i < argc - 1)
                             {
-                                strncpy_s(pInjector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
+                                strncpy_s(injector->output_file, MAX_PATH, argv[i+1], MAX_PATH);
                             }
                             else
                             {
@@ -143,7 +149,7 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
                         }
                         else if (!strncmp(extended_switch, "crt", strlen("crt")))
                         {
-                            pInjector->operation = INJECT_CRT;
+                            injector->operation = INJECT_CRT;
                             break;
                         }
                     }
@@ -162,14 +168,14 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
         i--;
     }
 
-    return (*operation == NO_OPERATION ? (pInjector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
+    return (*operation == NO_OPERATION ? (injector->operation = INJECT_LOAD_LIBRARY_A) : *operation); // default to use LoadLibraryA
 }
 #endif
 
 #ifndef _WIN32
-int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInjector)
+int ParseCommandLine(int argc, char** argv, Resource* resource, Injector* injector)
 {
-    int* operation = &(pInjector->operation);
+    int* operation = &(injector->operation);
     int i = argc - 1;
 
     if (argc < 3)
@@ -179,8 +185,8 @@ int ParseCommandLine(int argc, char** argv, Resource* pResource, Injector* pInje
     }
     else
     {
-        strncpy_s(pResource->target_process, MAX_PATH, argv[1], MAX_PATH);
-        strncpy_s(pResource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
+        strncpy_s(resource->target_process, MAX_PATH, argv[1], MAX_PATH);
+        strncpy_s(resource->dll_rel_path, MAX_PATH, argv[2], MAX_PATH);
     }
 
     // Unix ways of parsing the bullshit goes here

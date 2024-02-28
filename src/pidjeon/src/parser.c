@@ -3,15 +3,17 @@
 #include "logger.h"
 #include "util.h"
 
+#ifdef    __AVX__
 #include <immintrin.h>
+#endif /* __AVX__ */
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifdef    _WIN32
+#define   WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
 #include <unistd.h>
 #include <sys/man.h>
-#endif
+#endif /* _WIN32 */
 
 #include <stdio.h>
 
@@ -96,8 +98,12 @@ int ParseCommandLine(int argc, char** argv, Resource* resource, Injector* inject
                     if (i < argc - 1)
                     {
                         strncpy_s(arg_to_parse, sizeof(arg_to_parse), argv[i+1], sizeof(arg_to_parse));
+#ifdef    __AVX__
                         __m256i data = _mm256_loadu_si256((__m256i *)arg_to_parse);
                         _mm256_storeu_si256((__m256i *)(injector->output_file), data);
+#else
+                        memcpy(injector->output_file, arg_to_parse, sizeof(arg_to_parse));
+#endif /* __AVX__ */
                     }
                     else
                     {

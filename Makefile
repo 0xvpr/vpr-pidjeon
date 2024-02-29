@@ -53,11 +53,11 @@ ALL_TARGETS        := $(PIDJEON_TARGET).exe\
 all: $(ALL_TARGETS)
 
 $(ALL_TARGETS): $(ALL_SOURCES) | $(ALL_OBJECTS)
-	#$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86 --config $(CONFIG) $(VERBOSE) 
+	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x86 --config $(CONFIG) $(VERBOSE) 
 	$(CMAKE) --build $(PROJECT_OBJECT_DIR)/x64 --config $(CONFIG) $(VERBOSE) 
 
-#$(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
-	#$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x86
+$(PROJECT_OBJECT_DIR)/x86: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
+	$(CMAKE) -DPROJECT_ARCHITECTURE="x86" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x86
 
 $(PROJECT_OBJECT_DIR)/x64: $(shell find . -name "CMakeLists.txt") $(CMAKE_TOOLCHAIN)
 	$(CMAKE) -DPROJECT_ARCHITECTURE="x64" -DCMAKE_TOOLCHAIN_FILE="$(CMAKE_TOOLCHAIN)" -B $(PROJECT_OBJECT_DIR)/x64
@@ -71,7 +71,7 @@ docker-instance:
 	docker run -itv "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev"
 .PHONY: docker-build
 docker-build:
-	docker run -v "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev" make
+	docker run -v "$(shell pwd):/var/$(PROJECT)-dev/$(PROJECT)" -u "$(shell id -u):$(shell id -g)" "$(PROJECT)-dev" make "CONFIG=$(CONFIG)" 
 
 
 .PHONY: clean

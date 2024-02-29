@@ -6,4 +6,4 @@ project( vpr-pidjeon )
 add_subdirectory( src )
 
 ## Test targets
-#add_subdirectory( test )
+add_subdirectory( test )

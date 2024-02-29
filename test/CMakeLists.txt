@@ -1,5 +1,72 @@
 cmake_minimum_required( VERSION 3.22.0 )
 
+# --------------------------------------------------------------------------- #
+#                               Dummy Target                                  #
+# --------------------------------------------------------------------------- #
+
+project(dummy C)
+
+set( CMAKE_C_STANDARD          99 )
+set( CMAKE_C_STANDARD_REQUIRED ON )
+
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
+
+set( SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+
+set(
+    SOURCES
+    ${SOURCE_DIR}/dummy.c
+)
+
+add_executable(
+    ${PROJECT_NAME}
+    ${SOURCES}
+)
+
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}-${PROJECT_ARCHITECTURE}
+    SUFFIX ".exe"
+)
+
+# --------------------------------------------------------------------------- #
+#                              Payload Target                                 #
+# --------------------------------------------------------------------------- #
+
+project(payload C)
+
+set( CMAKE_C_STANDARD          99 )
+set( CMAKE_C_STANDARD_REQUIRED ON )
+
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
+
+set( SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+
+set(
+    SOURCES
+    ${SOURCE_DIR}/payload.c
+)
+
+add_library(
+    ${PROJECT_NAME}
+    SHARED
+    ${SOURCES}
+)
+
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}-${PROJECT_ARCHITECTURE}
+    PREFIX ""
+    SUFFIX ".dll"
+)
+
+# --------------------------------------------------------------------------- #
+#                                Live Tests                                   #
+# --------------------------------------------------------------------------- #
+
+
 if ( "${PROJECT_ARCHITECTURE}" STREQUAL "x64")
     ## Add testing support
     project( run-tests C )
@@ -78,7 +145,7 @@ if ( "${PROJECT_ARCHITECTURE}" STREQUAL "x64")
     )
 
     ## Link Dependencies
-    target_link_libraries( ${PROJECT_NAME} libcunit.a )
+    target_link_libraries( ${PROJECT_NAME} psapi libcunit.a )
 
     set_target_properties(
         ${PROJECT_NAME}

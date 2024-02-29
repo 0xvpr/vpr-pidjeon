@@ -9,6 +9,7 @@
 **/*.out
 **/*.zip
 **/*.pyc
+**.egg-info
 
 # Exclude directories
 __pycache__

@@ -2,24 +2,28 @@
 
 import ctypes
 import sys
+import os
 
 from ctypes import CDLL
 
-def inject(process_id: int, payload_path: bytes) -> int:
-    result = -1
+def inject(process_id: bytes, payload_path: bytes) -> int:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    dll = CDLL( current_dir + "\\lib\\vpr-pidjeon.dll");
 
-    loadlibrary = CDLL("lib/vpr-pidjeon.dll");
-    if loadlibrary:
-        result = loadlibrary.inject_i686(
-            ctypes.c_uint32(process_id),
-            payload_path
-        )
+    if not dll:
+        return -1
+
+    process_id = dll.GetProcessIdByProcessName(target)
+    result = dll.inject_i686(
+        process_id,
+        payload_path
+    )
 
     return result
 
 if __name__ == "__main__":
     # Parse arguments
-    target, payload = int(sys.argv[1]), sys.argv[2].encode()
+    target, payload = sys.argv[1].encode(), sys.argv[2].encode()
 
     # Verify target
 
@@ -28,4 +32,4 @@ if __name__ == "__main__":
     # Determine architecture of target
 
     # Inject
-    print(inject(target, payload))
+    print( inject(target, payload) )

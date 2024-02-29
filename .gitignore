@@ -8,8 +8,10 @@
 **/*.obj
 **/*.out
 **/*.zip
+**/*.pyc
 
 # Exclude directories
+__pycache__
 .vs
 bin
 out

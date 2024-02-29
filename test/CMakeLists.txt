@@ -7,14 +7,15 @@ if ( "${PROJECT_ARCHITECTURE}" STREQUAL "x64")
     ## Set output directory
     set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
-    ## Include directories
-    include_directories( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/pidjeon/include )
-    include_directories( ${PROJECT_NAME} /usr/local/share/mingw64/include )
-    set( INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/pidjeon/include)
-
     ## Source directories
-    set( SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/pidjeon/src)
+    set( SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
     set( TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+
+    ## Include directories
+    include_directories( ${PROJECT_NAME} ${SOURCE_DIR} )
+    include_directories( ${PROJECT_NAME} /usr/local/share/mingw64/include )
+    set( INCLUDE_DIR ${SOURCE_DIR} )
+
 
     ## Add CXX sources
     set(

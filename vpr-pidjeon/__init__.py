@@ -8,4 +8,3 @@
 
 # Define what gets imported with "from mypackage import *"
 #__all__ = ["MyClass", "my_function", "another_module"]
-

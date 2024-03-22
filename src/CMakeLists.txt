@@ -5,7 +5,7 @@ cmake_minimum_required( VERSION 3.22.0 )
 if ( "${PROJECT_ARCHITECTURE}" STREQUAL "x64")
     ## Initialize project
     project( vpr-pidjeon
-             VERSION        1.0.1
+             VERSION        1.0.0
              LANGUAGES      C
     )
 

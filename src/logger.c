@@ -20,7 +20,7 @@ int log_basic(const Injector* injector, const char* restrict event, uint32_t shi
     strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
     
     while (shiftwidth--) bytes_written += fputc(' ', stdout);
-    bytes_written += fprintf(stdout, "%s Log file created.\n%s %s.\n", prefix, prefix, event);
+    bytes_written += fprintf(stdout, "%s %s.\n", prefix, event);
 
     return bytes_written;
 }

@@ -19,7 +19,7 @@ from ctypes import (
     c_int32,
 )
 
-def _load_library_a(resource: POINTER(Resource), injector: POINTER(Injector)) -> c_int32:
+def _load_library_a(resource: POINTER[Resource], injector: POINTER[Injector]) -> c_int32:
     if not vpr_pidjeon_dll or not get_process_id_by_process_name or not load_library_a:
         Exception(ImportError)
 
@@ -30,7 +30,4 @@ def _load_library_a(resource: POINTER(Resource), injector: POINTER(Injector)) ->
 
 if __name__ == "__main__":
     resource, injector = handle_command_line()
-    _load_library_a(
-        byref(resource),
-        byref(injector)
-    )
+    _load_library_a( byref(resource), byref(injector) )

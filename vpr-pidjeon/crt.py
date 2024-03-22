@@ -19,7 +19,7 @@ from ctypes import (
     c_int32,
 )
 
-def _create_remote_thread(resource: POINTER(Resource), injector: POINTER(Injector)) -> c_int32:
+def _create_remote_thread(resource: POINTER[Resource], injector: POINTER[Injector]) -> c_int32:
     if not vpr_pidjeon_dll or not get_process_id_by_process_name or not create_remote_thread:
         Exception(ImportError)
 
@@ -30,7 +30,4 @@ def _create_remote_thread(resource: POINTER(Resource), injector: POINTER(Injecto
 
 if __name__ == "__main__":
     resource, injector = handle_command_line()
-    _create_remote_thread(
-        byref(resource),
-        byref(injector)
-    )
+    _create_remote_thread( byref(resource), byref(injector) )

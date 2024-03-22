@@ -1,7 +1,6 @@
 #include "crt.h"
 
 #include "logger.h"
-#include "mem.h"
 
 #ifndef VC_EXTRA_LEAN
 #define VC_EXTRA_LEAN

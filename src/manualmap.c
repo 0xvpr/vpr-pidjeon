@@ -100,7 +100,7 @@ unsigned inject_manual_map(const Resource * const restrict resource, const Injec
 
     GetFullPathName(resource->relative_payload_path, MAX_PATH, abs_payload_path, NULL);
 
-    if ( !is_dll_path_valid(resource->relative_payload_path) || !is_dll_path_valid(abs_payload_path))
+    if ( !file_exists(resource->relative_payload_path) || !file_exists(abs_payload_path))
     {
         LOG_MSG(injector, "Payload path is invalid", 0);
         return DLL_DOES_NOT_EXIST;

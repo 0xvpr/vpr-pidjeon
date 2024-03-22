@@ -19,7 +19,7 @@ unsigned load_library_a(const Resource * const restrict resource, const Injector
     TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
+    if (!(file_exists(resource->relative_payload_path)) || !file_exists(full_dll_path))
     {
         LOG_MSG(injector, "DLL path is not valid", 0);
         return DLL_DOES_NOT_EXIST;
@@ -81,7 +81,7 @@ unsigned load_library_a_i686(const Resource * const restrict resource, const Inj
     char full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
+    if (!(file_exists(resource->relative_payload_path)) || !file_exists(full_dll_path))
     {
         LOG_MSG(injector, "DLL path is not valid", 0);
         return DLL_DOES_NOT_EXIST;
@@ -165,7 +165,7 @@ unsigned load_library_w(const Resource * const restrict resource, const Injector
     TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
+    if (!(file_exists(resource->relative_payload_path)) || !file_exists(full_dll_path))
     {
         return DLL_DOES_NOT_EXIST;
     }
@@ -234,7 +234,7 @@ unsigned load_library_w_i686(const Resource * const restrict resource, const Inj
     TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
+    if (!(file_exists(resource->relative_payload_path)) || !file_exists(full_dll_path))
     {
         return DLL_DOES_NOT_EXIST;
     }

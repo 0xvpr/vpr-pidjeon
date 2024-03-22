@@ -3,8 +3,6 @@
 #include "definitions.h"
 #include "pe32.h"
 
-#include <stdio.h>
-
 #include <tlhelp32.h>
 
 typedef BOOL (WINAPI * IsWow64Process2_t)(HANDLE, USHORT*, USHORT*);
@@ -29,22 +27,6 @@ DWORD get_process_id_by_process_name(const char* const process_name)
 
     CloseHandle(processes_snapshot);
     return 0;
-}
-
-int is_dll_path_valid(const char* const restrict full_path)
-{
-    char path_buffer[MAX_PATH] = { 0 };
-    memcpy(path_buffer, full_path, sizeof(path_buffer)-1);
-
-    FILE* fp;
-    if (!(fp = fopen( path_buffer, "rb")))
-    {
-        fprintf(stderr, "invalid path: %s?\n", path_buffer);
-        return 0;
-    }
-
-    fclose(fp);
-    return 1;
 }
 
 int get_architecture(const HANDLE restrict process_handle)

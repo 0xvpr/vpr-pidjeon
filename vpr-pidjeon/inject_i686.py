@@ -1,43 +1,36 @@
 #!/usr/bin/env python3.exe
 
-import ctypes
-import sys
-import os
+from .util import handle_command_line
 
-from ctypes import CDLL
+from .types import (
+    Resource,
+    Injector
+)
 
-def inject(target: bytes, payload_path: bytes) -> int:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    dll = CDLL( current_dir + "\\lib\\vpr-pidjeon.dll");
+from .c_bindings import (
+    vpr_pidjeon_dll,
+    get_process_id_by_process_name,
+    load_library_a_i686,
+)
 
-    get_process_id_by_process_name = dll.GetProcessIdByProcessName
-    get_process_id_by_process_name.restype = ctypes.c_uint32
-    get_process_id_by_process_name.argtypes = [ctypes.c_char_p]
+from ctypes import (
+    POINTER,
+    byref,
+    c_int32,
+)
 
-    loadlibrarya = dll["inject_i686"]
-    loadlibrarya.restype = ctypes.c_uint32
-    loadlibrarya.argtypes = [ctypes.c_uint32, ctypes.c_char_p]
+def _load_library_a_i686(resource: POINTER(Resource), injector: POINTER(Injector)) -> c_int32:
+    if not vpr_pidjeon_dll or not get_process_id_by_process_name or not load_library_a_i686:
+        Exception(ImportError)
 
-    if not dll or not get_process_id_by_process_name or not loadlibrarya:
-        return -1
-
-    process_id = get_process_id_by_process_name(target)
-    result = loadlibrarya(
-        process_id,
-        payload_path
+    return load_library_a_i686(
+        resource,
+        injector
     )
 
-    return result
-
 if __name__ == "__main__":
-    # Parse arguments
-    target, payload = sys.argv[1].encode(), sys.argv[2].encode()
-
-    # Verify target
-
-    # Verify payload
-
-    # Determine architecture of target
-
-    # Inject
-    print( inject(target, payload) )
+    resource, injector = handle_command_line()
+    _load_library_a_i686(
+        byref(resource),
+        byref(injector)
+    )

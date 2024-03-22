@@ -20,11 +20,20 @@
 
 #include <stdint.h>
 
+enum int32_t {
+    machine_type_err =  -1,
+    machine_unknown =    0,
+    machine_x86 =        1,
+    machine_x64 =        2
+};
+
+typedef void* exec_mem_t;
+
 typedef struct _Resource
 {
     unsigned    process_id;
     char        target_process[MAX_PATH];
-    char        dll_rel_path[MAX_PATH];
+    char        relative_payload_path[MAX_PATH];
 } Resource;
 
 typedef struct _Injector
@@ -36,9 +45,8 @@ typedef struct _Injector
     int         silent;
     int         stealth;
     int         verbosity;
-    int (* logger)(const struct _Injector* injector, const char* restrict event, uint32_t shiftwidth);
+    int         (* logger)(const struct _Injector* injector, const char* restrict event, uint32_t shiftwidth);
     char        output_file[MAX_PATH];
 } Injector;
-
 
 #endif /* DEFINITIONS_HEADER */

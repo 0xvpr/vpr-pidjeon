@@ -1,15 +1,10 @@
 #include "manualmap.h"
 
 #include "definitions.h"
+#include "logger.h"
 #include "util.h"
 
-#include <tlhelp32.h>
-
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
-
-DWORD __stdcall LibraryLoader(LPVOID memory)
+DWORD __stdcall library_loader(LPVOID memory)
 {
     LoaderData* LoaderParams = (LoaderData *)memory;
     PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
@@ -98,19 +93,20 @@ DWORD __stdcall stub(void)
     return 0;
 }
 
-unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
+unsigned inject_manual_map(const Resource * const restrict resource, const Injector * const restrict injector)
 {
     LoaderData LoaderParams;
-    TCHAR abs_dll_path[MAX_PATH];
+    TCHAR abs_payload_path[MAX_PATH];
 
-    GetFullPathName(dll_path, MAX_PATH, abs_dll_path, NULL);
+    GetFullPathName(resource->relative_payload_path, MAX_PATH, abs_payload_path, NULL);
 
-    if (!(DllPathIsValid((char *)dll_path)) || !DllPathIsValid(abs_dll_path))
+    if ( !is_dll_path_valid(resource->relative_payload_path) || !is_dll_path_valid(abs_payload_path))
     {
+        LOG_MSG(injector, "Payload path is invalid", 0);
         return DLL_DOES_NOT_EXIST;
     }
 
-    HANDLE hFile = CreateFileA(abs_dll_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    HANDLE hFile = CreateFileA(abs_payload_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
     DWORD FileSize = GetFileSize(hFile, NULL);
     PVOID FileBuffer = VirtualAlloc(NULL, FileSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -120,7 +116,7 @@ unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)FileBuffer;
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)FileBuffer + pDosHeader->e_lfanew);
 
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, resource->process_id);
     
     PVOID ExecutableImage = VirtualAllocEx(hProcess, NULL, pNtHeaders->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
@@ -149,7 +145,7 @@ unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path)
 
     // Write the loader information to target process 
     WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(LoaderData), NULL);
-    WriteProcessMemory(hProcess, (PVOID)((LoaderData*)LoaderMemory + 1), (LPCVOID)LibraryLoader, (uintptr_t)stub - (uintptr_t)LibraryLoader, NULL);
+    WriteProcessMemory(hProcess, (PVOID)((LoaderData*)LoaderMemory + 1), (LPCVOID)library_loader, (uintptr_t)stub - (uintptr_t)library_loader, NULL);
     
     
     // Create a remote thread to execute the loader code

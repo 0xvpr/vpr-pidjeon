@@ -1,75 +1,66 @@
+#include "loadlibrary.h"
 #include "logger.h"
+#include "util.h"
 
 #include <windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
 
-#include <stdio.h>
 
-
-static inline int is_valid_dll(const char* restrict path)
+unsigned load_library_a(const Resource * const restrict resource, const Injector * const restrict injector)
 {
-    FILE* fp = fopen(path, "rb");
-    if (!fp)
+    HANDLE process_handle = NULL;
+    if (!resource->process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, resource->process_id))) )
     {
-        return 0;
-    }
-
-    return 1;
-}
-
-unsigned inject(DWORD process_id, char* restrict dll) 
-{
-    if (!process_id) 
-    {
+        LOG_MSG(injector, "Failed to open process", 0);
         return PROCESS_NOT_RUNNING;
     }
 
     TCHAR full_dll_path[MAX_PATH] = { 0 };
-    GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
+    GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_valid_dll(dll)) || !is_valid_dll(full_dll_path))
+    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
     {
+        LOG_MSG(injector, "DLL path is not valid", 0);
         return DLL_DOES_NOT_EXIST;
     }
+    LOG_MSG(injector, "DLL path is valid", 0);
 
     LPVOID pLoadLibraryA = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
     if (!pLoadLibraryA)
     {
+        LOG_MSG(injector, "Failed to load LoadLibraryA", 0);
         return INJECTION_FAILED;
     }
-    /*fprintf(stdout, "LoadLibraryA: %p\n", pLoadLibraryA);*/
+    LOG_MSG(injector, "LoadLibraryA successfully loaded", 0);
 
-    HANDLE process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, process_id);
-    if (!process_handle)
-    {
-        return INJECTION_FAILED;
-    }
-    /*fprintf(stdout, "process_handle: %p\n", process_handle);*/
-
-    // Allocate space to write the dll function
+    // Allocate space to write the DLL function
     LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, strlen(full_dll_path), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!dll_parameter_address)
     {
+        LOG_MSG(injector, "Failed to allocate memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
-    /*fprintf(stdout, "dll_parameter_address: %p\n", dll_parameter_address);*/
+    LOG_MSG(injector, "Allocated memory to target process", 0);
 
     BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path, strlen(full_dll_path), NULL);
     if (!wrote_memory)
     {
+        LOG_MSG(injector, "Failed to write memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Wrote memory to target process", 0);
 
     HANDLE dll_thread_handle = CreateRemoteThread(process_handle, 0, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, dll_parameter_address, 0, 0);
     if (!dll_thread_handle)
     {
+        LOG_MSG(injector, "Failed to create remote thread in target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
-    /*fprintf(stdout, "dll_thread_handle: %p\n", dll_thread_handle);*/
+    LOG_MSG(injector, "Remote thread created in target process", 0);
 
     VirtualFreeEx(process_handle, dll_parameter_address, (size_t)wrote_memory, MEM_RELEASE);
     CloseHandle(dll_thread_handle);
@@ -78,27 +69,24 @@ unsigned inject(DWORD process_id, char* restrict dll)
     return 0;
 }
 
-unsigned inject_i686(DWORD process_id, char* restrict dll)
+unsigned load_library_a_i686(const Resource * const restrict resource, const Injector * const restrict injector)
 {
-    if (!process_id) 
+    HANDLE process_handle = NULL;
+    if (!resource->process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, resource->process_id))) )
     {
+        LOG_MSG(injector, "Failed to open process", 0);
         return PROCESS_NOT_RUNNING;
     }
 
     char full_dll_path[MAX_PATH] = { 0 };
-    GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
+    GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_valid_dll(dll)) || !is_valid_dll(full_dll_path))
+    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
     {
+        LOG_MSG(injector, "DLL path is not valid", 0);
         return DLL_DOES_NOT_EXIST;
     }
-
-
-    HANDLE process_handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, process_id);
-    if (!process_handle)
-    {
-        return INJECTION_FAILED;
-    }
+    LOG_MSG(injector, "DLL path is valid", 0);
 
     DWORD remote_kernel_base = 0;
     HMODULE hMods[1024] = { 0 };
@@ -123,55 +111,61 @@ unsigned inject_i686(DWORD process_id, char* restrict dll)
     DWORD offset = 0x30F30;
     HANDLE pLoadLibraryA = (HANDLE)(0xFFFFFFFFF & (remote_kernel_base + offset) );
 
-    fprintf(stdout, "remote_kernel_base: %lx\n", remote_kernel_base);
-    fprintf(stdout, "offset: %lx\n", offset);
-    fprintf(stdout, "pLoadLibraryA: %p\n", pLoadLibraryA);
-
     if (!pLoadLibraryA)
     {
+        LOG_MSG(injector, "Failed to find LoadLibraryA import", 0);
         return METHOD_NOT_FOUND;
     }
+    LOG_MSG(injector, "LoadLibraryA import found", 0);
 
-    // Allocate space to write the dll function
-    HANDLE dll_parameter_address = VirtualAllocEx(process_handle, 0, strlen(full_dll_path), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    // Allocate space to write the DLL function
+    LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, strlen(full_dll_path), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!dll_parameter_address)
     {
+        LOG_MSG(injector, "Failed to allocate memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Allocated memory to target process", 0);
 
-    BOOL wrote_memory = WriteProcessMemory(process_handle, (PVOID)dll_parameter_address, full_dll_path, strlen(full_dll_path), NULL);
+    BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path, strlen(full_dll_path), NULL);
     if (!wrote_memory)
     {
+        LOG_MSG(injector, "Failed to write memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Wrote memory to target process", 0);
 
-    HANDLE dll_thread_handle = CreateRemoteThread(process_handle, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, (PVOID)dll_parameter_address, 0, NULL);
+    HANDLE dll_thread_handle = CreateRemoteThread(process_handle, 0, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, dll_parameter_address, 0, 0);
     if (!dll_thread_handle)
     {
+        LOG_MSG(injector, "Failed to create remote thread in target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Remote thread created in target process", 0);
 
     VirtualFreeEx(process_handle, dll_parameter_address, (size_t)wrote_memory, MEM_RELEASE);
-    CloseHandle((HANDLE)dll_thread_handle);
+    CloseHandle(dll_thread_handle);
     CloseHandle(process_handle);
     
     return 0;
 }
 
-unsigned inject_wide(DWORD process_id, char* restrict dll)
+unsigned load_library_w(const Resource * const restrict resource, const Injector * const restrict injector)
 {
-    if (process_id == 0)
+    HANDLE process_handle = NULL;
+    if (!resource->process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, resource->process_id))) )
     {
+        LOG_MSG(injector, "Failed to open process", 0);
         return PROCESS_NOT_RUNNING;
     }
 
     TCHAR full_dll_path[MAX_PATH] = { 0 };
-    GetFullPathName(dll, MAX_PATH, full_dll_path, NULL);
+    GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
 
-    if (!(is_valid_dll(dll)) || !is_valid_dll(full_dll_path))
+    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
     {
         return DLL_DOES_NOT_EXIST;
     }
@@ -179,42 +173,116 @@ unsigned inject_wide(DWORD process_id, char* restrict dll)
     WCHAR dll_w[MAX_PATH] = { 0 };
     WCHAR full_dll_path_w[MAX_PATH] = { 0 };
 
-    for (size_t i = 0; dll[i] != 0; ++i) { dll_w[i] = (WCHAR)dll[i]; }
+    for (size_t i = 0; resource->relative_payload_path[i] != 0; ++i)
+    {
+        dll_w[i] = (WCHAR)resource->relative_payload_path[i];
+    }
     GetFullPathNameW(dll_w, MAX_PATH, full_dll_path_w, NULL);
 
     LPVOID pLoadLibraryW = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryW");
     if (!pLoadLibraryW)
     {
+        LOG_MSG(injector, "Failed to load LoadLibraryW", 0);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "LoadLibraryW successfully loaded", 0);
 
-    HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
-    if (!process_handle)
-    {
-        return INJECTION_FAILED;
-    }
-
-    // Allocate space to write the dll function
-    LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, sizeof(WCHAR) * wcslen(full_dll_path_w), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    // Allocate space to write the DLL function
+    LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, wcslen(full_dll_path_w), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!dll_parameter_address)
     {
+        LOG_MSG(injector, "Failed to allocate memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Allocated memory to target process", 0);
 
-    BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path_w, sizeof(WCHAR) * wcslen(full_dll_path_w), NULL);
+    BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path, wcslen(full_dll_path_w), NULL);
     if (!wrote_memory)
     {
+        LOG_MSG(injector, "Failed to write memory to target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Wrote memory to target process", 0);
 
-    HANDLE dll_thread_handle = CreateRemoteThread(process_handle, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryW, dll_parameter_address, 0, NULL);
+    HANDLE dll_thread_handle = CreateRemoteThread(process_handle, 0, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryW, dll_parameter_address, 0, 0);
     if (!dll_thread_handle)
     {
+        LOG_MSG(injector, "Failed to create remote thread in target process", 0);
         CloseHandle(process_handle);
         return INJECTION_FAILED;
     }
+    LOG_MSG(injector, "Remote thread created in target process", 0);
+
+    VirtualFreeEx(process_handle, dll_parameter_address, (size_t)wrote_memory, MEM_RELEASE);
+    CloseHandle(dll_thread_handle);
+    CloseHandle(process_handle);
+    
+    return 0;
+}
+
+unsigned load_library_w_i686(const Resource * const restrict resource, const Injector * const restrict injector)
+{
+    HANDLE process_handle = NULL;
+    if (!resource->process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, resource->process_id))) )
+    {
+        LOG_MSG(injector, "Failed to open process", 0);
+        return PROCESS_NOT_RUNNING;
+    }
+
+    TCHAR full_dll_path[MAX_PATH] = { 0 };
+    GetFullPathName(resource->relative_payload_path, MAX_PATH, full_dll_path, NULL);
+
+    if (!(is_dll_path_valid(resource->relative_payload_path)) || !is_dll_path_valid(full_dll_path))
+    {
+        return DLL_DOES_NOT_EXIST;
+    }
+
+    WCHAR dll_w[MAX_PATH] = { 0 };
+    WCHAR full_dll_path_w[MAX_PATH] = { 0 };
+
+    for (size_t i = 0; resource->relative_payload_path[i] != 0; ++i)
+    {
+        dll_w[i] = (WCHAR)resource->relative_payload_path[i];
+    }
+    GetFullPathNameW(dll_w, MAX_PATH, full_dll_path_w, NULL);
+
+    LPVOID pLoadLibraryW = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryW");
+    if (!pLoadLibraryW)
+    {
+        LOG_MSG(injector, "Failed to load LoadLibraryW", 0);
+        return INJECTION_FAILED;
+    }
+    LOG_MSG(injector, "LoadLibraryW successfully loaded", 0);
+
+    // Allocate space to write the DLL function
+    LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, wcslen(full_dll_path_w), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    if (!dll_parameter_address)
+    {
+        LOG_MSG(injector, "Failed to allocate memory to target process", 0);
+        CloseHandle(process_handle);
+        return INJECTION_FAILED;
+    }
+    LOG_MSG(injector, "Allocated memory to target process", 0);
+
+    BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path, wcslen(full_dll_path_w), NULL);
+    if (!wrote_memory)
+    {
+        LOG_MSG(injector, "Failed to write memory to target process", 0);
+        CloseHandle(process_handle);
+        return INJECTION_FAILED;
+    }
+    LOG_MSG(injector, "Wrote memory to target process", 0);
+
+    HANDLE dll_thread_handle = CreateRemoteThread(process_handle, 0, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryW, dll_parameter_address, 0, 0);
+    if (!dll_thread_handle)
+    {
+        LOG_MSG(injector, "Failed to create remote thread in target process", 0);
+        CloseHandle(process_handle);
+        return INJECTION_FAILED;
+    }
+    LOG_MSG(injector, "Remote thread created in target process", 0);
 
     VirtualFreeEx(process_handle, dll_parameter_address, (size_t)wrote_memory, MEM_RELEASE);
     CloseHandle(dll_thread_handle);

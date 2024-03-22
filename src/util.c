@@ -1,68 +1,40 @@
 #include "util.h"
-#include "pe32.h"
-#include "definitions.h"
 
-#include <stdlib.h>
+#include "definitions.h"
+#include "pe32.h"
+
 #include <stdio.h>
 
+#include <tlhelp32.h>
+
 typedef BOOL (WINAPI * IsWow64Process2_t)(HANDLE, USHORT*, USHORT*);
-IsWow64Process2_t fIsWow64Process2;
 
-void __usage_error(const char* restrict msg, char* argv_0)
+DWORD get_process_id_by_process_name(const char* const process_name)
 {
-    fprintf(stderr,
-        "Error message: %s.\n"
-        "\n"
-        "Usage: %s <target_process> <path/to/payload> [ <optional arguments> ]\n"
-        "\n"
-        "positional arguments:\n"
-        "  target_process.exe, path/to/payload\n"
-        "\n"
-        "optional arguments:\n"
-        "  -d\t\tadd delay to the injection (milliseconds)\n"
-        "  -i\t\tspecify injection method\n"
-        "  -o,--output\tspecify output file\n"
-        "  -r\t\tcreate remote thread\n"
-        "  -s,--silent\tsuppress output\n"
-        "  -S,--stealth\tspecify stealth level\n"
-        "  -V\t\tspecify verbosity level\n"
-        "\n"
-        "example:\n"
-        "  %s calc.exe ./payload.dll -i LoadLibraryA -d 2000\n"
-        , msg, argv_0, argv_0
-    );
+    PROCESSENTRY32 process_entry = { 0 };
+    process_entry.dwSize = sizeof(PROCESSENTRY32);
+    HANDLE processes_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-    exit(1);
-}
-
-void __handle_error(unsigned inject_code)
-{
-    switch (inject_code)
+    if (Process32First(processes_snapshot, &process_entry))
     {
-        case INCORRECT_PARAMETERS:
-            fprintf(stdout, "Error code %d: Incorrect Paramters.\n", INCORRECT_PARAMETERS);
-            break;
-        case PROCESS_NOT_RUNNING:
-            fprintf(stdout, "Error code %d: Process is not running.\n", PROCESS_NOT_RUNNING);
-            break;
-        case DLL_DOES_NOT_EXIST:
-            fprintf(stdout, "Error code %d: DLL does not exist.\n", DLL_DOES_NOT_EXIST);
-            break;
-        case INJECTION_FAILED:
-            fprintf(stdout, "Error code %d: Injection Failed.\n", DLL_DOES_NOT_EXIST);
-            break;
-        default:
-            break;
+        do
+        {
+            if (strcmp(process_entry.szExeFile, process_name) == 0)
+            {
+                CloseHandle(processes_snapshot);
+                return process_entry.th32ProcessID;
+            }
+        } while (Process32Next(processes_snapshot, &process_entry));
     }
+
+    CloseHandle(processes_snapshot);
+    return 0;
 }
 
-int DllPathIsValid(char* restrict full_path)
+int is_dll_path_valid(const char* const restrict full_path)
 {
     char path_buffer[MAX_PATH] = { 0 };
-    for (unsigned i = 0; i < MAX_PATH; ++i)
-    {
-        path_buffer[i] = full_path[i];
-    }
+    memcpy(path_buffer, full_path, sizeof(path_buffer)-1);
 
     FILE* fp;
     if (!(fp = fopen( path_buffer, "rb")))
@@ -75,12 +47,12 @@ int DllPathIsValid(char* restrict full_path)
     return 1;
 }
 
-int GetArchitechture(HANDLE hProcess)
+int get_architecture(const HANDLE restrict process_handle)
 {
-    unsigned short pHostMachine;
-    unsigned short pProcessMachine;
+    unsigned short host_machine;
+    unsigned short process_machine;
 
-    fIsWow64Process2 = (IsWow64Process2_t)GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process2");
+    IsWow64Process2_t fIsWow64Process2 = (IsWow64Process2_t)GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process2");
     if (!fIsWow64Process2)
     {
         fprintf(stderr, "Failed to load IsWow64Process2\n");
@@ -91,22 +63,22 @@ int GetArchitechture(HANDLE hProcess)
         fprintf(stdout, "fIsWow64Process2 found: %p\n", (void *)fIsWow64Process2);
     }
 
-    if (!fIsWow64Process2(hProcess, &pProcessMachine, &pHostMachine))
+    if (!fIsWow64Process2(process_handle, &process_machine, &host_machine))
     {
         fprintf(stderr, "Failed to detect architecture\n");
-        return -1;
+        return machine_type_err;
     }
 
-    if ((pProcessMachine) & IMAGE_FILE_32BIT_MACHINE)
+    if ((process_machine) & IMAGE_FILE_32BIT_MACHINE)
     {
         fprintf(stdout, "PE32 detected\n");
-        return 1;
+        return machine_x86;
     }
     else
     {
         fprintf(stdout, "PE32+ detected\n");
-        return 2;
+        return machine_x64;
     }
 
-    return 0;
+    return machine_unknown;
 }

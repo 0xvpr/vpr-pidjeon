@@ -2,8 +2,6 @@
 #include "CUnit/Console.h"
 
 #include "definitions.h"
-#include "injector.h"
-#include "parser.h"
 #include "logger.h"
 
 #include <tchar.h>
@@ -44,50 +42,6 @@ int clean_suite(void)
   temp_file = NULL;
   remove("cunit.log");
   return 0;
-}
-
-void test_ParseCommandLine_UnspecifiedInjector(void)
-{
-    int argc = 3;
-    char* argv[3] = { "injector.exe", "target.exe", "payload.dll" };
-
-    Resource resource = { 0 };
-    Injector injector = { .output_file = "log.txt" };
-
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &resource, &injector));
-}
-
-void test_ParseCommandLine_SpecifyLoadLibraryA(void)
-{
-    int argc = 5;
-    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryA" };
-
-    Resource resource = { 0 };
-    Injector injector = { .output_file = "log.txt" };
-
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_A, ParseCommandLine(argc, argv, &resource, &injector));
-}
-
-void test_ParseCommandLine_SpecifyLoadLibraryW(void)
-{
-    int argc = 5;
-    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "LoadLibraryW" };
-
-    Resource resource = { 0 };
-    Injector injector = { .output_file = "log.txt" };
-
-    CU_ASSERT_EQUAL(INJECT_LOAD_LIBRARY_W, ParseCommandLine(argc, argv, &resource, &injector));
-}
-
-void test_ParseCommandLine_SpecifyManualMap(void)
-{
-    int argc = 5;
-    char* argv[5] = { "injector.exe", "target.exe", "payload.dll", "-i", "ManualMap" };
-
-    Resource resource = { 0 };
-    Injector injector = { .output_file = "log.txt" };
-
-    CU_ASSERT_EQUAL(INJECT_MANUAL_MAP, ParseCommandLine(argc, argv, &resource, &injector));
 }
 
 void test_log_basic_CreateLogFile(void)
@@ -163,11 +117,7 @@ int main(void)
 
     /* add the tests to the suite */
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if ( NULL == CU_add_test( pSuite, "ParseCommandLine(Unspecified) -> LoadLibraryA",      test_ParseCommandLine_UnspecifiedInjector) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryA) -> LoadLibraryA",     test_ParseCommandLine_SpecifyLoadLibraryA) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(LoadLibraryW) -> LoadLibraryW",     test_ParseCommandLine_SpecifyLoadLibraryW) ||
-         NULL == CU_add_test( pSuite, "ParseCommandLine(ManualMap) -> ManualMap",           test_ParseCommandLine_SpecifyManualMap)    ||
-         NULL == CU_add_test( pSuite, "log_basic() -> Create log file",                     test_log_basic_CreateLogFile)               ||
+    if ( NULL == CU_add_test( pSuite, "log_basic() -> Create log file",                     test_log_basic_CreateLogFile)               ||
          NULL == CU_add_test( pSuite, "log_basic() -> Append to log file",                  test_log_basic_AppendToLogFile)
        )
     {

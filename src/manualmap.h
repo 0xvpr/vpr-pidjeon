@@ -1,6 +1,8 @@
 #ifndef MANUAL_MAP_HEADER
 #define MANUAL_MAP_HEADER
 
+#include "definitions.h"
+
 #include <windows.h>
 
 typedef FARPROC(__stdcall * pGetProcAddress)(HMODULE, LPCSTR);
@@ -17,10 +19,6 @@ typedef struct _LoaderData
 	pGetProcAddress fnGetProcAddress;
 } LoaderData;
 
-DWORD __stdcall LibraryLoader(LPVOID memory);
-
-DWORD __stdcall stub(void);
-
-unsigned inject_ManualMap(DWORD process_id, const char* restrict dll_path);
+unsigned inject_manual_map(const Resource * const restrict, const Injector * const restrict injector);
 
 #endif /* MANUAL_MAP_HEADER */

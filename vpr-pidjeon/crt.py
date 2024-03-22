@@ -10,7 +10,7 @@ from .types import (
 from .c_bindings import (
     vpr_pidjeon_dll,
     get_process_id_by_process_name,
-    load_library_a,
+    create_remote_thread,
 )
 
 from ctypes import (
@@ -19,18 +19,18 @@ from ctypes import (
     c_int32,
 )
 
-def _load_library_a(resource: POINTER(Resource), injector: POINTER(Injector)) -> c_int32:
-    if not vpr_pidjeon_dll or not get_process_id_by_process_name or not load_library_a:
+def _create_remote_thread(resource: POINTER(Resource), injector: POINTER(Injector)) -> c_int32:
+    if not vpr_pidjeon_dll or not get_process_id_by_process_name or not create_remote_thread:
         Exception(ImportError)
 
-    return load_library_a(
+    return create_remote_thread(
         resource,
         injector
     )
 
 if __name__ == "__main__":
     resource, injector = handle_command_line()
-    _load_library_a(
+    _create_remote_thread(
         byref(resource),
         byref(injector)
     )

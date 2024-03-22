@@ -35,7 +35,7 @@ def main() -> None:
     button.setGeometry(0, 0, 150, 45)
 
     widget.setGeometry(50, 50, 320, 200)
-    widget.setWindowTitle("App")
+    widget.setWindowTitle("vpr-pidjeon")
     widget.show()
 
     sys.exit(app.exec_())

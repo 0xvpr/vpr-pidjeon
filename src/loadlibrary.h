@@ -1,13 +1,11 @@
 #ifndef LOAD_LIBRARY_HEADER
 #define LOAD_LIBRARY_HEADER
 
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
-#include <windows.h>
-#endif /* VC_EXTRA_LEAN */
+#include "definitions.h"
 
-unsigned inject(DWORD process_id, char* restrict dll);
-unsigned inject_i686(DWORD process_id, char* restrict dll);
-unsigned inject_wide(DWORD process_id, char* restrict dll);
+unsigned load_library_a(const Resource * const restrict, const Injector * const restrict);
+unsigned load_library_a_i686(const Resource * const restrict, const Injector * const restrict);
+unsigned load_library_w(const Resource * const restrict, const Injector * const restrict);
+unsigned load_library_w_i686(const Resource * const restrict, const Injector * const restrict);
 
 #endif /* LOAD_LIBRARY_HEADER */

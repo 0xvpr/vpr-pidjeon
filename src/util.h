@@ -6,10 +6,10 @@
 #include <windows.h>
 #endif // VC_EXTRA_LEAN
 
-void __usage_error(const char* restrict msg, char* restrict argv_0);
+DWORD get_process_id_by_process_name(const char* const restrict process_name);
 
-int DllPathIsValid(char* restrict full_path);
+int is_dll_path_valid(const char* const restrict full_path);
 
-int GetArchitechture(HANDLE restrict hProcess);
+int get_architecture(const HANDLE restrict hProcess);
 
 #endif /* UTIL_HEADER */

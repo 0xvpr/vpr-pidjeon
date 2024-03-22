@@ -3,8 +3,8 @@
 from .util import handle_command_line
 
 from .types import (
-    Resource,
-    Injector
+    ResourcePtr,
+    InjectorPtr
 )
 
 from .c_bindings import (
@@ -14,12 +14,11 @@ from .c_bindings import (
 )
 
 from ctypes import (
-    POINTER,
     byref,
     c_int32,
 )
 
-def _load_library_a(resource: POINTER[Resource], injector: POINTER[Injector]) -> c_int32:
+def _load_library_a(resource: ResourcePtr, injector: InjectorPtr) -> c_int32:
     if not vpr_pidjeon_dll or not get_process_id_by_process_name or not load_library_a:
         Exception(ImportError)
 

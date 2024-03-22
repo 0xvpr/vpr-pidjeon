@@ -65,3 +65,10 @@ class Injector(ctypes.Structure):
         self.verbosity = verbosity
         self.logger = self._logger_t(logger)
         self.output_file = output_file
+
+
+class ResourcePtr(ctypes.POINTER(Resource)):
+    ...
+
+class InjectorPtr(ctypes.POINTER(Injector)):
+    ...

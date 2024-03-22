@@ -14,6 +14,8 @@ __all__ = [
 
 import ctypes
 
+from typing import Any
+
 class Resource(ctypes.Structure):
     _fields_ = [
         ("process_id",              ctypes.c_uint32),
@@ -53,7 +55,7 @@ class Injector(ctypes.Structure):
             silent:      ctypes.c_int32  = ctypes.c_int32(0),
             stealth:     ctypes.c_int32  = ctypes.c_int32(0),
             verbosity:   ctypes.c_int32  = ctypes.c_int32(0),
-            logger:      _logger_t       = 0,
+            logger:      Any             = 0,
             output_file: bytes           = b"vpr-pidjeon.log" ):
 
         super().__init__()

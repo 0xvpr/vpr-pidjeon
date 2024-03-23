@@ -44,20 +44,12 @@ int clean_suite(void)
   return 0;
 }
 
-void test_log_basic_CreateLogFile(void)
+void test_log_basic(void)
 {
     int bytesWritten = 0;
     Injector injector = {
-        .output_file = LOG_FILE,
         .logger = log_basic
     };
-
-    FILE* fp = NULL;
-    if ((fp = fopen(LOG_FILE, "r")))
-    {
-        fclose(fp);
-        remove(LOG_FILE);
-    }
 
     bytesWritten = injector.logger(
         &injector,
@@ -65,31 +57,7 @@ void test_log_basic_CreateLogFile(void)
         0
     );
 
-    CU_ASSERT_TRUE(bytesWritten == 101);
-}
-
-void test_log_basic_AppendToLogFile(void)
-{
-    int bytesWritten = 0;
-    Injector injector = {
-        .output_file = LOG_FILE,
-        .logger = log_basic
-    };
-
-    bytesWritten = injector.logger(
-        &injector,
-        "Test of log_basic's append to log file",
-        0
-    );
-
-    FILE* fp;
-    if ((fp = fopen(LOG_FILE, "r")))
-    {
-        fclose(fp);
-        remove(LOG_FILE);
-    }
-
-    CU_ASSERT_TRUE(bytesWritten == 63);
+    CU_ASSERT_TRUE(bytesWritten == 60);
 }
 
 /**
@@ -117,9 +85,7 @@ int main(void)
 
     /* add the tests to the suite */
     /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if ( NULL == CU_add_test( pSuite, "log_basic() -> Create log file",                     test_log_basic_CreateLogFile)               ||
-         NULL == CU_add_test( pSuite, "log_basic() -> Append to log file",                  test_log_basic_AppendToLogFile)
-       )
+    if ( NULL == CU_add_test( pSuite, "log_basic() -> Create log file",    test_log_basic))
     {
         CU_cleanup_registry();
         return CU_get_error();

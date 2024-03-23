@@ -8,8 +8,11 @@
 **/*.obj
 **/*.out
 **/*.zip
+**/*.pyc
+**.egg-info
 
 # Exclude directories
+__pycache__
 .vs
 bin
 out

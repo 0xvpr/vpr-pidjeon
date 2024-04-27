@@ -1,13 +1,12 @@
-#include "logger.h"
-#include "util.h"
+#include "logger.hpp"
+#include "util.hpp"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
-int log_basic(const Injector* injector, const char* restrict event, uint32_t shiftwidth)
-{
-    (void)injector;
+int log_basic(const injector& inj, const char* event, uint32_t shiftwidth) {
+    (void)inj;
     int bytes_written = 0;
 
     time_t rawtime = 0;
@@ -25,11 +24,10 @@ int log_basic(const Injector* injector, const char* restrict event, uint32_t shi
     return bytes_written;
 }
 
-int log_advanced(const Injector* injector, const char* restrict event, unsigned shiftwidth)
-{
+int log_advanced(const injector& inj, const char* event, uint32_t shiftwidth) {
     int bytesWritten        = 0;
-    int verbosity           = injector->verbosity;
-    const char* output_file = injector->output_file;
+    int verbosity           = inj.verbosity;
+    const char* output_file = inj.output_file;
 
     FILE* fp = NULL;
     if (!file_exists(output_file))

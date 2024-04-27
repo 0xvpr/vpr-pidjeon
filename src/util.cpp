@@ -1,15 +1,16 @@
-#include "util.h"
+#include "util.hpp"
 
-#include "definitions.h"
-#include "pe32.h"
+#include "definitions.hpp"
+#include "pe32.hpp"
 
 #include <tlhelp32.h>
 
 typedef BOOL (WINAPI * IsWow64Process2_t)(HANDLE, USHORT*, USHORT*);
 
-DWORD get_process_id_by_process_name(const char* const process_name)
-{
-    PROCESSENTRY32 process_entry = { 0 };
+std::vector<DWORD> get_process_id_by_process_name(const char* const process_name) {
+    std::vector<DWORD> processes;
+
+    PROCESSENTRY32 process_entry{};
     process_entry.dwSize = sizeof(PROCESSENTRY32);
     HANDLE processes_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
@@ -19,18 +20,37 @@ DWORD get_process_id_by_process_name(const char* const process_name)
         {
             if (strcmp(process_entry.szExeFile, process_name) == 0)
             {
-                CloseHandle(processes_snapshot);
-                return process_entry.th32ProcessID;
+                processes.push_back(process_entry.th32ProcessID);
             }
         } while (Process32Next(processes_snapshot, &process_entry));
     }
 
     CloseHandle(processes_snapshot);
-    return 0;
+    return processes;
 }
 
-int get_architecture(const HANDLE restrict process_handle)
-{
+std::string get_process_name_by_process_id(DWORD process_id) {
+    PROCESSENTRY32 process_entry{};
+    process_entry.dwSize = sizeof(PROCESSENTRY32);
+    HANDLE processes_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (Process32First(processes_snapshot, &process_entry))
+    {
+        do
+        {
+            if (process_entry.th32ProcessID == process_id)
+            {
+                CloseHandle(processes_snapshot);
+                return process_entry.szExeFile;
+            }
+        } while (Process32Next(processes_snapshot, &process_entry));
+    }
+
+    CloseHandle(processes_snapshot);
+    return "";
+}
+
+int get_architecture(const HANDLE process_handle) {
     unsigned short host_machine;
     unsigned short process_machine;
 

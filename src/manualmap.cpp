@@ -1,11 +1,10 @@
-#include "manualmap.h"
+#include "manualmap.hpp"
 
-#include "definitions.h"
-#include "logger.h"
-#include "util.h"
+#include "definitions.hpp"
+#include "logger.hpp"
+#include "util.hpp"
 
-DWORD __stdcall library_loader(LPVOID memory)
-{
+DWORD __stdcall library_loader(LPVOID memory) {
     LoaderData* LoaderParams = (LoaderData *)memory;
     PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
 
@@ -93,17 +92,16 @@ DWORD __stdcall stub(void)
     return 0;
 }
 
-unsigned inject_manual_map(const Resource * const restrict resource, const Injector * const restrict injector)
-{
+unsigned inject_manual_map(const resource& res, const injector& inj) {
     LoaderData LoaderParams;
     TCHAR abs_payload_path[MAX_PATH];
 
-    GetFullPathName(resource->relative_payload_path, MAX_PATH, abs_payload_path, NULL);
+    GetFullPathName(res.relative_payload_path, MAX_PATH, abs_payload_path, NULL);
 
-    if ( !file_exists(resource->relative_payload_path) || !file_exists(abs_payload_path))
+    if ( !file_exists(res.relative_payload_path) || !file_exists(abs_payload_path))
     {
-        LOG_MSG(injector, "Payload path is invalid", 0);
-        return DLL_DOES_NOT_EXIST;
+        LOG_MSG(inj, "Payload path is invalid", 0);
+        return inject::dll_does_not_exist;
     }
 
     HANDLE hFile = CreateFileA(abs_payload_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
@@ -116,7 +114,7 @@ unsigned inject_manual_map(const Resource * const restrict resource, const Injec
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)FileBuffer;
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)FileBuffer + pDosHeader->e_lfanew);
 
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, resource->process_id);
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, res.process_id);
     
     PVOID ExecutableImage = VirtualAllocEx(hProcess, NULL, pNtHeaders->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 

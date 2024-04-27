@@ -2,6 +2,7 @@
 #define PARSER_HEADER
 
 #include "definitions.hpp"
+#include "logger.hpp"
 
 #include <filesystem>
 #include <string>
@@ -22,6 +23,7 @@ struct parsed_args_t {
     std::int32_t                stealth;
     bool                        silent;
     std::filesystem::path       log_path;
+    logger_t                    logger;
 };
 
 enum error_codes : uint32_t {
@@ -43,8 +45,8 @@ public:
 
     argument_parser(int argc, char** argv);
 
-    types::error_codes parse();
     const types::parsed_args_t& parsed_args() const;
+    types::error_codes parse();
     [[noreturn]] void usage(const std::string error_message) const;
 private:
     types::error_codes parse_option(const std::string& option, const std::string& value);

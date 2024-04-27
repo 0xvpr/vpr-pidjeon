@@ -9,7 +9,7 @@
 
 unsigned inject_ManualMap(DWORD process_id, const char* dll_path);
 
-void inject_payload(resource& resource, injector& injector);
+void inject_payload(types::resource& resource, types::injector& injector);
 
 void __handle_error(int error_code);
 

@@ -116,6 +116,10 @@ argument_parser::argument_parser(int argc_, char** argv_)
                 .operation = inject::operation::load_library_a }
 {}
 
+const types::parsed_args_t& argument_parser::parsed_args() const {
+    return parsed_args_;
+}
+
 types::error_codes argument_parser::parse() {
     if (argc < 3) {
         usage("Not enough arguments provided");
@@ -169,13 +173,10 @@ types::error_codes argument_parser::parse() {
         return types::error_codes::invalid_arguments;
     }
 
+    parsed_args_.logger = loggers[parsed_args_.verbosity];
 
     std::cout << "Selected process: " << parsed_args_.process_id << "." << std::endl;
     return types::error_codes::no_error;
-}
-
-const types::parsed_args_t& argument_parser::parsed_args() const {
-    return parsed_args_;
 }
 
 void argument_parser::usage(const std::string error_message) const {

@@ -10,12 +10,6 @@
 #include "logger.hpp"
 #include "parser.hpp"
 
-static logger_t loggers[3] = {
-    nullptr,
-    log_basic,
-    log_advanced
-};
-
 int main(int argc, char** argv) {
     auto p = parser::argument_parser(argc, argv);
     if (p.parse())
@@ -24,10 +18,10 @@ int main(int argc, char** argv) {
     }
     const parser::types::parsed_args_t& args = p.parsed_args();
 
-    resource res{ .process_id = args.process_id,
+    types::resource res{ .process_id = args.process_id,
                   .target_process = args.process_name.c_str(),
                   .relative_payload_path = args.relative_payload_path.c_str() };
-    injector inj{ .status = 0,
+    types::injector inj{ .status = 0,
                   .operation = args.operation,
                   .delay_ms = static_cast<std::uint32_t>(args.delay.count()),
                   .silent = args.silent,

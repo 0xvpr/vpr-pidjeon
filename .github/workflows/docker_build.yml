@@ -18,11 +18,11 @@ jobs:
       - name: build project
         run: make docker-build
 
-      - name: Transfer binaries to Windows
-        uses: actions/upload-artifact@v4
-        with:
-          name: binaries
-          path: bin
+      #- name: Transfer binaries to Windows
+        #uses: actions/upload-artifact@v4
+        #with:
+          #name: binaries
+          #path: bin
 
   #trigger_windows_unit_test:
     #needs: [docker_build]

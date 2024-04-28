@@ -3,14 +3,12 @@
 
 #include <stdint.h>
 
-typedef struct _MsDosStub
-{
+typedef struct _MsDosStub {
     uint16_t mMagic;
     uint8_t  bits[126];
 } MsDosStub;
 
-typedef struct _Pe32Header
-{
+typedef struct _Pe32Header {
     uint32_t mMagic; // PE\0\0 or 0x00004550
     uint16_t mMachine;
     uint16_t mNumberOfSections;
@@ -21,8 +19,7 @@ typedef struct _Pe32Header
     uint16_t mCharacteristics;
 } Pe32Header;
 
-typedef struct _Pe32OptionalHeader
-{
+typedef struct _Pe32OptionalHeader {
     uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
     uint8_t  mMajorLinkerVersion;
     uint8_t  mMinorLinkerVersion;
@@ -88,8 +85,7 @@ typedef struct _Pe32PlusOptionalHeader
     uint32_t mNumberOfRvaAndSizes;
 } Pe32PlusOptionalHeader;
 
-typedef struct _Pe32SectionHeader
-{
+typedef struct _Pe32SectionHeader {
     uint8_t  mName[8];
     uint32_t mVirtualSize;
     uint32_t mVirtualAddress;
@@ -102,12 +98,10 @@ typedef struct _Pe32SectionHeader
     uint32_t mCharacteristics;
 } Pe32SectionHeader;
 
-typedef struct _Pe32FullHeader
-{
+typedef struct _Pe32FullHeader {
     MsDosStub   msDosStub;
     Pe32Header  pe32Header;
-    union
-    {
+    union {
         Pe32OptionalHeader      pe32OptionalHeader;
         Pe32PlusOptionalHeader  pe32PlusOptionalHeader;
     };

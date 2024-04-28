@@ -1,17 +1,17 @@
-#include "logger.h"
-#include "util.h"
+#include "logger.hpp"
+#include "util.hpp"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <filesystem>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 
-int log_basic(const Injector* injector, const char* restrict event, uint32_t shiftwidth)
-{
-    (void)injector;
+std::int32_t log_basic(const types::parsed_args_t& args, const char* event, std::uint32_t shiftwidth) {
+    (void)args;
     int bytes_written = 0;
 
     time_t rawtime = 0;
-    struct tm* info = NULL;
+    struct tm* info = nullptr;
 
     time(&rawtime);
     info = localtime(&rawtime);
@@ -25,19 +25,23 @@ int log_basic(const Injector* injector, const char* restrict event, uint32_t shi
     return bytes_written;
 }
 
-int log_advanced(const Injector* injector, const char* restrict event, unsigned shiftwidth)
-{
-    int bytesWritten        = 0;
-    int verbosity           = injector->verbosity;
-    const char* output_file = injector->output_file;
+std::int32_t log_advanced(const types::parsed_args_t& args, const char* event, std::uint32_t shiftwidth) {
+    int bytesWritten = 0;
+    int verbosity = args.verbosity;
+    char output_file[MAX_PATH]{ 0 };
+    [&args, &output_file]() -> auto {
+        const std::string& path_wstr = args.log_path.string();
+        std::size_t str_size = path_wstr.size();
+        for (std::size_t i = 0; i < str_size; ++i) {
+            output_file[i] = static_cast<char>(path_wstr[i] & 0xFF);
+        }
+    }();
 
-    FILE* fp = NULL;
-    if (!file_exists(output_file))
-    {
-        if ((fp = fopen(output_file, "wb")))
-        {
+    FILE* fp = nullptr;
+    if (!std::filesystem::exists(output_file)) {
+        if ((fp = fopen(output_file, "wb"))) {
             time_t rawtime = 0;
-            struct tm* info = NULL;
+            struct tm* info = nullptr;
 
             time(&rawtime);
             info = localtime(&rawtime);
@@ -49,10 +53,8 @@ int log_advanced(const Injector* injector, const char* restrict event, unsigned 
             bytesWritten += fprintf(fp, "%s Log file created.\n", prefix);
             fclose(fp);
         }
-        else
-        {
-            if (verbosity > 2)
-            {
+        else {
+            if (verbosity > 2) {
                 fprintf(stderr, "Error while opening '%s'.", output_file);
             }
 
@@ -60,10 +62,9 @@ int log_advanced(const Injector* injector, const char* restrict event, unsigned 
         }
     }
 
-    if ((fp = fopen(output_file, "ab")))
-    {
+    if ((fp = fopen(output_file, "ab"))) {
         time_t rawtime = 0;
-        struct tm* info = NULL;
+        struct tm* info = nullptr;
 
         time(&rawtime);
         info = localtime(&rawtime);
@@ -74,13 +75,11 @@ int log_advanced(const Injector* injector, const char* restrict event, unsigned 
         while (shiftwidth--) fputc(' ', fp);
         bytesWritten += fprintf(fp, "%s %s.\n", prefix, event);
         fclose(fp);
-    }
-    else
-    {
-        if (verbosity > 1)
-        {
+    } else {
+        if (verbosity > 1) {
             fprintf(stderr, "Error while opening '%s'.", output_file);
         }
+
         return -1;
     }
 

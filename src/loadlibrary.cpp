@@ -4,6 +4,8 @@
 
 #include <windows.h>
 
+#include <filesystem>
+
 std::int32_t load_library_a(const types::parsed_args_t& args) {
     HANDLE process_handle = nullptr;
     if (!args.process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id))) )
@@ -15,7 +17,8 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
     TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(args.relative_payload_path.data(), MAX_PATH, full_dll_path, nullptr);
 
-    if (!(file_exists(args.relative_payload_path)) || !file_exists(full_dll_path))
+    if ( !std::filesystem::exists(args.relative_payload_path) ||
+         !std::filesystem::exists(full_dll_path) )
     {
         LOG_MSG(args, "DLL path is not valid", 0);
         return inject::dll_does_not_exist;
@@ -23,8 +26,7 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
     LOG_MSG(args, "DLL path is valid", 0);
 
     LPVOID pLoadLibraryA = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
-    if (!pLoadLibraryA)
-    {
+    if (!pLoadLibraryA) {
         LOG_MSG(args, "Failed to load LoadLibraryA", 0);
         return inject::injection_failed;
     }
@@ -32,8 +34,7 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
 
     // Allocate space to write the DLL function
     LPVOID dll_parameter_address = VirtualAllocEx(process_handle, 0, strlen(full_dll_path), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (!dll_parameter_address)
-    {
+    if (!dll_parameter_address) {
         LOG_MSG(args, "Failed to allocate memory to target process", 0);
         CloseHandle(process_handle);
         return inject::injection_failed;
@@ -41,8 +42,7 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
     LOG_MSG(args, "Allocated memory to target process", 0);
 
     BOOL wrote_memory = WriteProcessMemory(process_handle, dll_parameter_address, full_dll_path, strlen(full_dll_path), nullptr);
-    if (!wrote_memory)
-    {
+    if (!wrote_memory) {
         LOG_MSG(args, "Failed to write memory to target process", 0);
         CloseHandle(process_handle);
         return inject::injection_failed;
@@ -50,8 +50,7 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
     LOG_MSG(args, "Wrote memory to target process", 0);
 
     HANDLE dll_thread_handle = CreateRemoteThread(process_handle, 0, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, dll_parameter_address, 0, 0);
-    if (!dll_thread_handle)
-    {
+    if (!dll_thread_handle) {
         LOG_MSG(args, "Failed to create remote thread in target process", 0);
         CloseHandle(process_handle);
         return inject::injection_failed;
@@ -76,7 +75,8 @@ std::int32_t load_library_w(const types::parsed_args_t& args) {
     TCHAR full_dll_path[MAX_PATH] = { 0 };
     GetFullPathName(args.relative_payload_path.data(), MAX_PATH, full_dll_path, nullptr);
 
-    if (!(file_exists(args.relative_payload_path)) || !file_exists(full_dll_path))
+    if ( !std::filesystem::exists(args.relative_payload_path) ||
+         !std::filesystem::exists(full_dll_path) )
     {
         return inject::dll_does_not_exist;
     }

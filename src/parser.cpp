@@ -158,13 +158,13 @@ types::error_codes argument_parser::parse() {
                 iss >> process_id;
                 if (!iss.fail() && process_id != 0) {
                     parsed_args_.process_id = process_id;
-                    parsed_args_.process_name = get_process_name_by_process_id(parsed_args_.process_id);
+                    parsed_args_.process_name = util::get_process_name_by_process_id(parsed_args_.process_id);
 
                     process_id_set = true;
                     continue;
                 }
 
-                auto processes = get_process_id_by_process_name(argv_[i]);
+                auto processes = util::get_process_ids_by_process_name(argv_[i]);
                 if (processes.size()) {
                     parsed_args_.process_name = argv_[i];
                     parsed_args_.process_id = select_process(processes);

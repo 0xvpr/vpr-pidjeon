@@ -99,7 +99,8 @@ std::int32_t inject_manual_map(const types::parsed_args_t& args) {
 
     GetFullPathName(args.relative_payload_path.data(), MAX_PATH, abs_payload_path, nullptr);
 
-    if ( !file_exists(args.relative_payload_path) || !file_exists(abs_payload_path))
+    if ( !std::filesystem::exists(args.relative_payload_path) ||
+         !std::filesystem::exists(abs_payload_path))
     {
         LOG_MSG(args, "Payload path is invalid", 0);
         return inject::dll_does_not_exist;

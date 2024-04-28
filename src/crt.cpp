@@ -14,6 +14,7 @@ char* extract_bytes_from_file(const char* f, size_t* size) {
     if ( !(fp = fopen(f, "rb")) )
     {
         fclose(fp);
+        return 0;
     }
     fseek(fp, 0, SEEK_END);
     *size = (size_t)ftell(fp);

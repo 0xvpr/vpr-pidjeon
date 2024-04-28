@@ -1,6 +1,7 @@
 #include "logger.hpp"
 #include "util.hpp"
 
+#include <filesystem>
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
@@ -37,7 +38,7 @@ std::int32_t log_advanced(const types::parsed_args_t& args, const char* event, s
     }();
 
     FILE* fp = nullptr;
-    if (!file_exists(output_file)) {
+    if (!std::filesystem::exists(output_file)) {
         if ((fp = fopen(output_file, "wb"))) {
             time_t rawtime = 0;
             struct tm* info = nullptr;

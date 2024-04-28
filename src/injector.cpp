@@ -42,9 +42,6 @@ int __handle_error(std::int32_t inject_code) {
 }
 
 std::int32_t inject_payload(const types::parsed_args_t& args) {
-    fprintf(stdout, "Searching for %s...\n", args.process_name.c_str());
-    fprintf(stdout, "%s Found.\n\n", args.process_name.c_str());
-    
     if (args.delay.count()) {
         printf("Delay(ms): %llu\n\n", args.delay.count());
         Sleep((DWORD)(args.delay.count() & 0xFFFFFFFF));

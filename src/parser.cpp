@@ -1,5 +1,6 @@
 #include "parser.hpp"
 
+#include "version.hpp"
 #include "logger.hpp"
 #include "util.hpp"
 
@@ -195,23 +196,48 @@ void argument_parser::usage(const std::string error_message) const {
     fprintf(stderr,
         "Error message: %s.\n"
         "\n"
-        "Usage: %s <target_process> <path/to/payload> [ <optional arguments> ]\n"
+        "Usage:\n"
+        "  %s [<optional_arguments>] <target_process> <path/to/payload> \n"
         "\n"
-        "positional arguments:\n"
-        "  target_process.exe, path/to/payload\n"
+        "Positional arguments (no specific order required):\n"
+        "  <target_process>  Specify either the executable name or process id\n"
+        "  <path/to/payload> Specify either the full or relative (POSIX compliant)\n"
+        "                    path to a payload.\n"
         "\n"
-        "optional arguments:\n"
-        "  -i               specify injection method\n"
-        "  -d               add delay to the injection (milliseconds)\n"
-        "  -s,-ss\n"
-        "  --stealth=N      set stealth level 0-2\n"
-        "  -v,-vv,\n"
-        "  --verbosity=N    set verbosity level 0-2\n"
-        "  -o,--output-file specify output log file (verbose level 2)\n"
+        "Optional arguments:\n"
+        "  -i <method>       Specify injection one of the following injection methods:\n"
+        "                    LoadLibraryA|lla (default method),\n"
+        "                    LoadLibraryW|llw,\n"
+        "                    ManualMap|mm,\n"
+        "                    CreateRemoteThread|crt.\n"
+        "  -d <milliseconds> Add delay to the injection.\n"
+        "  -s,               Set stealth level 0-2.\n"
+        "  -ss,\n"
+        "  --stealth=<N>\n"
+        "  -v,               Set verbosity level 0-2.\n"
+        "  -vv,\n"
+        "  --verbosity=<N>\n"
+        "  -o <file>,        Specify output log file (verbose level 2).\n"
+        "  --output-file <file>\n"
         "\n"
-        "example:\n"
-        "  %s calc.exe ./payload.dll -i LoadLibraryA -d 2000\n"
-        , error_message.c_str(), parsed_args_.program_name.c_str(), parsed_args_.program_name.c_str()
+        "Examples:\n"
+        "  Injection using default injection method (LoadLibraryA):\n"
+        "    %s calc.exe ./payload.dll\n"
+        "  Injection using Manual Map injection method (mm) with verbosity enabled:\n"
+        "    %s -i mm ./payload.bin 1234 -v\n"
+        "\n"
+        "Version:\n"
+        "  %d.%d.%d\n"
+        "\n"
+        "Author:\n"
+        "  VPR\n",
+        error_message.c_str(),
+        parsed_args_.program_name.c_str(),
+        parsed_args_.program_name.c_str(),
+        parsed_args_.program_name.c_str(),
+        version::major,
+        version::minor,
+        version::patch
     );
 
     exit(1);

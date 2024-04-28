@@ -20,24 +20,43 @@ payload into a target process.
 
 ## Usage
 ```bash
-Error message: Missing positional arguments.
+Error message: Not enough arguments provided.
 
-Usage: vpr-pidjeon.exe <target_process> <path/to/payload> [ <optional arguments> ]
+Usage:
+  vpr-pidjeon-x64.exe [<optional_arguments>] <target_process> <path/to/payload>
 
-positional arguments:
-  target_process.exe, path/to/payload
+Positional arguments (no specific order required):
+  <target_process>  Specify either the executable name or process id
+  <path/to/payload> Specify either the full or relative (POSIX compliant)
+                    path to a payload.
 
-optional arguments:
-  -d            add delay to the injection (milliseconds)
-  -i            specify injection method
-  -o,--output   specify output file
-  -r            create remote thread
-  -s,--silent   suppress output
-  -S,--stealth  specify stealth level
-  -V            specify verbosity level
+Optional arguments:
+  -i <method>       Specify injection one of the following injection methods:
+                    LoadLibraryA|lla (default method),
+                    LoadLibraryW|llw,
+                    ManualMap|mm,
+                    CreateRemoteThread|crt.
+  -d <milliseconds> Add delay to the injection.
+  -s,               Set stealth level 0-2.
+  -ss,
+  --stealth=<N>
+  -v,               Set verbosity level 0-2.
+  -vv,
+  --verbosity=<N>
+  -o <file>,        Specify output log file (verbose level 2).
+  --output-file <file>
 
-example:
-  vpr-pidjeon.exe calc.exe ./payload.dll -i LoadLibraryA -d 2000
+Examples:
+  Injection using default injection method (LoadLibraryA):
+    vpr-pidjeon-x64.exe calc.exe ./payload.dll
+  Injection using Manual Map injection method (mm) with verbosity enabled:
+    vpr-pidjeon-x64.exe -i mm ./payload.bin 1234 -v
+
+Version:
+  2.0.1
+
+Author:
+  VPR
 ```
 
 ## Building

@@ -5,7 +5,7 @@
 #include <windows.h>
 
 
-unsigned load_library_a(const resource& res, const injector& inj) {
+unsigned load_library_a(const types::resource& res, const types::injector& inj) {
     HANDLE process_handle = nullptr;
     if (!res.process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, res.process_id))) )
     {
@@ -14,7 +14,7 @@ unsigned load_library_a(const resource& res, const injector& inj) {
     }
 
     TCHAR full_dll_path[MAX_PATH] = { 0 };
-    GetFullPathName(res.relative_payload_path, MAX_PATH, full_dll_path, nullptr);
+    GetFullPathName(res.relative_payload_path.data(), MAX_PATH, full_dll_path, nullptr);
 
     if (!(file_exists(res.relative_payload_path)) || !file_exists(full_dll_path))
     {
@@ -59,14 +59,14 @@ unsigned load_library_a(const resource& res, const injector& inj) {
     }
     LOG_MSG(inj, "Remote thread created in target process", 0);
 
-    VirtualFreeEx(process_handle, dll_parameter_address, (size_t)wrote_memory, MEM_RELEASE);
+    VirtualFreeEx(process_handle, dll_parameter_address, (std::size_t)wrote_memory, MEM_RELEASE);
     CloseHandle(dll_thread_handle);
     CloseHandle(process_handle);
     
     return 0;
 }
 
-unsigned load_library_w(const resource& res, const injector& inj) {
+unsigned load_library_w(const types::resource& res, const types::injector& inj) {
     HANDLE process_handle = nullptr;
     if (!res.process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, res.process_id))) )
     {
@@ -75,7 +75,7 @@ unsigned load_library_w(const resource& res, const injector& inj) {
     }
 
     TCHAR full_dll_path[MAX_PATH] = { 0 };
-    GetFullPathName(res.relative_payload_path, MAX_PATH, full_dll_path, nullptr);
+    GetFullPathName(res.relative_payload_path.data(), MAX_PATH, full_dll_path, nullptr);
 
     if (!(file_exists(res.relative_payload_path)) || !file_exists(full_dll_path))
     {

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 {
     PROCESS_INFORMATION pi = { 0 };
     STARTUPINFO         si = { 0 };
-    HANDLE              p = NULL;
+    HANDLE              p = nullptr;
     DWORD               pid = 0;
     BOOL                arch = 0;
     BOOL                rv = 0;
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
             return 2;
         }
 
-        GetModuleFileNameExA(p, NULL, full_path, MAX_PATH);
+        GetModuleFileNameExA(p, nullptr, full_path, MAX_PATH);
         CloseHandle(p);
         fprintf(stdout, "%s\n", full_path);
     }
@@ -85,14 +85,14 @@ int main(int argc, char** argv)
 
     si.cb = sizeof(si);
     rv = CreateProcess(
-        NULL,           // No module name (use command line)
+        nullptr,           // No module name (use command line)
         command,        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
+        nullptr,           // Process handle not inheritable
+        nullptr,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
         0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
+        nullptr,           // Use parent's environment block
+        nullptr,           // Use parent's starting directory 
         &si,            // Pointer to STARTUPINFO structure
         &pi             // Pointer to PROCESS_INFORMATION structure
     );

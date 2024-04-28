@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
                   .relative_payload_path = args.relative_payload_path.c_str() };
     types::injector inj{ .status = 0,
                   .operation = args.operation,
-                  .delay_ms = static_cast<std::uint32_t>(args.delay.count()),
+                  .delay_ms = args.delay,
                   .silent = args.silent,
                   .stealth = args.stealth,
                   .verbosity = args.verbosity,

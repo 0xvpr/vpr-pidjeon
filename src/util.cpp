@@ -68,19 +68,19 @@ int get_architecture(const HANDLE process_handle) {
     if (!fIsWow64Process2(process_handle, &process_machine, &host_machine))
     {
         fprintf(stderr, "Failed to detect architecture\n");
-        return machine_type_err;
+        return types::machine_type_err;
     }
 
     if ((process_machine) & IMAGE_FILE_32BIT_MACHINE)
     {
         fprintf(stdout, "PE32 detected\n");
-        return machine_x86;
+        return types::machine_x86;
     }
     else
     {
         fprintf(stdout, "PE32+ detected\n");
-        return machine_x64;
+        return types::machine_x64;
     }
 
-    return machine_unknown;
+    return types::machine_unknown;
 }

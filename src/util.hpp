@@ -16,8 +16,19 @@ std::string get_process_name_by_process_id(DWORD process_id);
 int get_architecture(const HANDLE process_handle);
 
 __forceinline int file_exists(const char* file) {
-    FILE* fp;
+    FILE* fp = nullptr;
     if (!(fp = fopen(file, "rb")))
+    {
+        return 0;
+    }
+    
+    fclose(fp);
+    return 1;
+}
+
+__forceinline int file_exists(std::string_view file) {
+    FILE* fp = nullptr;
+    if (!(fp = fopen(file.data(), "rb")))
     {
         return 0;
     }

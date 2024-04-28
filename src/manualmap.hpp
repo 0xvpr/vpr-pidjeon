@@ -18,6 +18,6 @@ typedef struct _LoaderData {
 	pGetProcAddress fnGetProcAddress;
 } LoaderData;
 
-unsigned inject_manual_map(const resource&, const injector&);
+unsigned inject_manual_map(const types::resource&, const types::injector&);
 
 #endif /* MANUAL_MAP_HEADER */

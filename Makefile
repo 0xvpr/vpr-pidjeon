@@ -8,7 +8,7 @@ ifeq ($(VERBOSE),1)
 VERBOSE             = --verbose
 endif
 
-CMAKE               = /bin/cmake
+CMAKE               = cmake
 CMAKE_SOURCES      := $(shell find . -name "CMakeLists.txt")
 CMAKE_TOOLCHAIN    := $(addprefix ./,mingw-toolchain.cmake)
 

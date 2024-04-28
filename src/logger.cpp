@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-int log_basic(const injector& inj, const char* event, uint32_t shiftwidth) {
+int log_basic(const types::injector& inj, const char* event, std::uint32_t shiftwidth) {
     (void)inj;
     int bytes_written = 0;
 
     time_t rawtime = 0;
-    struct tm* info = NULL;
+    struct tm* info = nullptr;
 
     time(&rawtime);
     info = localtime(&rawtime);
@@ -24,18 +24,16 @@ int log_basic(const injector& inj, const char* event, uint32_t shiftwidth) {
     return bytes_written;
 }
 
-int log_advanced(const injector& inj, const char* event, uint32_t shiftwidth) {
+int log_advanced(const types::injector& inj, const char* event, std::uint32_t shiftwidth) {
     int bytesWritten        = 0;
     int verbosity           = inj.verbosity;
-    const char* output_file = inj.output_file;
+    const char* output_file = inj.output_file.data();
 
-    FILE* fp = NULL;
-    if (!file_exists(output_file))
-    {
-        if ((fp = fopen(output_file, "wb")))
-        {
+    FILE* fp = nullptr;
+    if (!file_exists(output_file)) {
+        if ((fp = fopen(output_file, "wb"))) {
             time_t rawtime = 0;
-            struct tm* info = NULL;
+            struct tm* info = nullptr;
 
             time(&rawtime);
             info = localtime(&rawtime);
@@ -47,10 +45,8 @@ int log_advanced(const injector& inj, const char* event, uint32_t shiftwidth) {
             bytesWritten += fprintf(fp, "%s Log file created.\n", prefix);
             fclose(fp);
         }
-        else
-        {
-            if (verbosity > 2)
-            {
+        else {
+            if (verbosity > 2) {
                 fprintf(stderr, "Error while opening '%s'.", output_file);
             }
 
@@ -58,10 +54,9 @@ int log_advanced(const injector& inj, const char* event, uint32_t shiftwidth) {
         }
     }
 
-    if ((fp = fopen(output_file, "ab")))
-    {
+    if ((fp = fopen(output_file, "ab"))) {
         time_t rawtime = 0;
-        struct tm* info = NULL;
+        struct tm* info = nullptr;
 
         time(&rawtime);
         info = localtime(&rawtime);
@@ -72,13 +67,11 @@ int log_advanced(const injector& inj, const char* event, uint32_t shiftwidth) {
         while (shiftwidth--) fputc(' ', fp);
         bytesWritten += fprintf(fp, "%s %s.\n", prefix, event);
         fclose(fp);
-    }
-    else
-    {
-        if (verbosity > 1)
-        {
+    } else {
+        if (verbosity > 1) {
             fprintf(stderr, "Error while opening '%s'.", output_file);
         }
+
         return -1;
     }
 

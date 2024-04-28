@@ -5,6 +5,7 @@
 #include <conio.h>
 
 #include <iostream>
+#include <codecvt>
 #include <string>
 #include <cstdio>
 
@@ -103,8 +104,14 @@ inject::operation get_operation(std::string_view op_str) {
 
 static inline
 std::string path_to_string(const std::filesystem::path& path) {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    return converter.to_bytes(path.wstring());
+    std::size_t str_size = path.string().size();
+    std::string result(0, str_size);
+
+    for (std::size_t i = 0; i < str_size; ++i) {
+        result[i] = (char)(path.string()[i] & 0xFF);
+    }
+
+    return result;
 }
 
 namespace parser {

@@ -2,7 +2,6 @@
 #define INJECTOR_HEADER
 
 #include "definitions.hpp"
-#include "util.hpp"
 
 #include <windows.h>
 #include <tlhelp32.h>

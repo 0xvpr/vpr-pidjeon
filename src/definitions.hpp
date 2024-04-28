@@ -1,12 +1,18 @@
-#ifndef DEFINITIONS_HEADER
-#define DEFINITIONS_HEADER
+#ifndef   DEFINITIONS_HEADER
+#define   DEFINITIONS_HEADER
 
-#include <cstdint>
-#include <string>
+#include  <windows.h>
+
+#include  <filesystem>
+#include  <string>
+#include  <chrono>
+
+#include  <cstdint>
 
 namespace inject {
 
-enum error : std::uint32_t {
+enum status : std::int32_t {
+    success                   = 0,
     incorrect_parameters      = 100,
     process_not_running       = 101,
     dll_does_not_exist        = 102,
@@ -26,30 +32,28 @@ enum operation : std::uint32_t {
 
 namespace types {
 
-enum machine_type : std::int32_t {
-    machine_type_err          = -1,
-    machine_unknown           =  0,
-    machine_x86               =  1,
-    machine_x64               =  2
+enum machine : std::int32_t {
+    type_err                  = -1,
+    unknown                   =  0,
+    x86                       =  1,
+    x64                       =  2
 };
 
-typedef struct _resource {
-    unsigned                  process_id;
-    std::string_view          target_process;
-    std::string_view          relative_payload_path;
-} resource;
-
-typedef struct _injector {
-    std::uint32_t             status;
+struct parsed_args_t {
+    std::string               program_name;
+    std::string               process_name;
+    DWORD                     process_id;
+    std::filesystem::path     payload_path;
+    std::string               relative_payload_path;
     inject::operation         operation;
-    std::chrono::milliseconds delay_ms;
-    bool                      silent;
-    std::int32_t              stealth;
+    std::chrono::milliseconds delay;
     std::int32_t              verbosity;
-    std::int32_t              (* logger)(const _injector& injector, const char* event, std::uint32_t shiftwidth);
-    std::string               output_file;
-} injector;
+    std::int32_t              stealth;
+    std::filesystem::path     log_path;
+    std::int32_t              (* logger)(const parsed_args_t& args, const char* event, std::uint32_t shiftwidth);
+};
 
+typedef int (* logger_t)(const parsed_args_t&, const char*, std::uint32_t);
 typedef void* exec_mem_t;
 
 } // namespace types

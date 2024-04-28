@@ -1,8 +1,8 @@
-#ifndef CREATE_REMOTE_THREAD_HEADER
-#define CREATE_REMOTE_THREAD_HEADER
+#ifndef   CREATE_REMOTE_THREAD_HEADER
+#define   CREATE_REMOTE_THREAD_HEADER
 
 #include "definitions.hpp"
 
-unsigned create_remote_thread(const types::resource&, const types::injector&);
+std::int32_t create_remote_thread(const types::parsed_args_t&);
 
 #endif // CREATE_REMOTE_THREAD_HEADER

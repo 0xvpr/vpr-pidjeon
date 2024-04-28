@@ -17,12 +17,12 @@ set( SOURCES
      # CXX sources
      ${SOURCE_DIR}/main.cpp
      ${SOURCE_DIR}/crt.cpp
+     ${SOURCE_DIR}/injector.cpp
      ${SOURCE_DIR}/loadlibrary.cpp
      ${SOURCE_DIR}/logger.cpp
-     ${SOURCE_DIR}/manualmap.cpp
-     ${SOURCE_DIR}/util.cpp
-     ${SOURCE_DIR}/injector.cpp
+     ${SOURCE_DIR}/manual_map.cpp
      ${SOURCE_DIR}/parser.cpp
+     ${SOURCE_DIR}/util.cpp
 )
 
 include_directories( ${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR} )

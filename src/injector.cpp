@@ -1,13 +1,15 @@
 #include "definitions.hpp"
+
 #include "loadlibrary.hpp"
-#include "manualmap.hpp"
+#include "manual_map.hpp"
 #include "injector.hpp"
 #include "logger.hpp"
 #include "crt.hpp"
 
 #include <stdio.h>
 
-void __handle_error(std::uint32_t inject_code) {
+static inline
+int __handle_error(std::int32_t inject_code) {
     switch (inject_code)
     {
         case inject::incorrect_parameters:
@@ -35,38 +37,40 @@ void __handle_error(std::uint32_t inject_code) {
             break;
         }
     }
+
+    return 0;
 }
 
-void inject_payload(types::resource& res, types::injector& inj) {
-    fprintf(stdout, "Searching for %s...\n", res.target_process.data());
-    fprintf(stdout, "%s Found.\n\n", res.target_process.data());
+std::int32_t inject_payload(const types::parsed_args_t& args) {
+    fprintf(stdout, "Searching for %s...\n", args.process_name.c_str());
+    fprintf(stdout, "%s Found.\n\n", args.process_name.c_str());
     
-    if (inj.delay_ms.count()) {
-        printf("Delay(ms): %llu\n\n", inj.delay_ms.count());
-        Sleep(inj.delay_ms.count());
+    if (args.delay.count()) {
+        printf("Delay(ms): %llu\n\n", args.delay.count());
+        Sleep((DWORD)(args.delay.count() & 0xFFFFFFFF));
     }
 
-    inj.status = inject::injection_failed;
-    switch (inj.operation)
+    int32_t status = inject::injection_failed;
+    switch (args.operation)
     {
         case inject::operation::load_library_a:
         {
-            inj.status = load_library_a(res, inj);
+            status = load_library_a(args);
             break;
         }
         case inject::operation::load_library_w:
         {
-            inj.status = load_library_w(res, inj);
+            status = load_library_w(args);
             break;
         }
         case inject::operation::manual_map:
         {
-            inj.status = inject_manual_map(res, inj);
+            status = inject_manual_map(args);
             break;
         }
         case inject::operation::crt:
         {
-            inj.status = create_remote_thread(res, inj);
+            status = create_remote_thread(args);
             break;
         }
         default:
@@ -75,8 +79,8 @@ void inject_payload(types::resource& res, types::injector& inj) {
         }
     }
 
-    if (inj.status != 0) {
-        __handle_error(inj.status);
-    }
-    LOG_MSG(inj, (std::string("Injection: %s.\n") + (inj.status ? "Failed" : "Successful")).c_str(), 0);
+    status && __handle_error(status);
+    LOG_MSG(args, (std::string("Injection: ") + (status ? "Failed" : "Successful")).c_str(), 0);
+
+    return status;
 }

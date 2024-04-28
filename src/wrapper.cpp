@@ -1,5 +1,6 @@
 #include "util.h"
 #include "mem.h"
+#include "util.hpp"
 
 #include <string.h>
 #include <stdio.h>
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
         fprintf(stdout, "%s\n", full_path);
     }
 
-    arch = GetArchitechture(full_path);
+    arch = get_architecture(full_path);
     switch (arch)
     {
         case -1:
@@ -85,14 +86,14 @@ int main(int argc, char** argv)
 
     si.cb = sizeof(si);
     rv = CreateProcess(
-        nullptr,           // No module name (use command line)
+        nullptr,        // No module name (use command line)
         command,        // Command line
-        nullptr,           // Process handle not inheritable
-        nullptr,           // Thread handle not inheritable
+        nullptr,        // Process handle not inheritable
+        nullptr,        // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
         0,              // No creation flags
-        nullptr,           // Use parent's environment block
-        nullptr,           // Use parent's starting directory 
+        nullptr,        // Use parent's environment block
+        nullptr,        // Use parent's starting directory 
         &si,            // Pointer to STARTUPINFO structure
         &pi             // Pointer to PROCESS_INFORMATION structure
     );

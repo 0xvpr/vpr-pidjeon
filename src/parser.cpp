@@ -1,4 +1,6 @@
 #include "parser.hpp"
+
+#include "logger.hpp"
 #include "util.hpp"
 
 #include <windows.h>
@@ -9,6 +11,7 @@
 #include <string>
 #include <cstdio>
 
+static inline
 void get_cursor_position(short& x, short& y) {
     CONSOLE_SCREEN_BUFFER_INFO csbi{};
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
@@ -17,6 +20,7 @@ void get_cursor_position(short& x, short& y) {
     y = csbi.dwCursorPosition.Y;
 }
 
+static inline
 void goto_xy(short x, short y) {
     COORD coord;
     coord.X = x;
@@ -24,6 +28,7 @@ void goto_xy(short x, short y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+static inline
 void print_options(const std::vector<DWORD>& processes, std::size_t selected_option, short x_start, short y_start) {
     std::size_t size = processes.size();
     for (std::size_t i = 0; i < size; ++i) {
@@ -105,7 +110,7 @@ inject::operation get_operation(std::string_view op_str) {
 static inline
 std::string path_to_string(const std::filesystem::path& path) {
     std::size_t str_size = path.string().size();
-    std::string result(0, str_size);
+    std::string result(str_size, 0);
 
     for (std::size_t i = 0; i < str_size; ++i) {
         result[i] = (char)(path.string()[i] & 0xFF);
@@ -116,9 +121,9 @@ std::string path_to_string(const std::filesystem::path& path) {
 
 namespace parser {
 
-argument_parser::argument_parser(int argc_, char** argv_)
-: argc( argc_ ),
-  argv( argv_ ),
+argument_parser::argument_parser(int argc, char** argv)
+: argc_( argc ),
+  argv_( argv ),
   parsed_args_{ .program_name = argv[0],
                 .operation = inject::operation::load_library_a }
 {}
@@ -128,7 +133,7 @@ const types::parsed_args_t& argument_parser::parsed_args() const {
 }
 
 types::error_codes argument_parser::parse() {
-    if (argc < 3) {
+    if (argc_ < 3) {
         usage("Not enough arguments provided");
     }
 
@@ -136,11 +141,11 @@ types::error_codes argument_parser::parse() {
     bool payload_path_set = false;
 
     types::error_codes status = types::error_codes::no_error;
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
+    for (int i = 1; i < argc_; ++i) {
+        std::string arg = argv_[i];
         if (arg[0] == '-') {
-            if (i + 1 < argc && argv[i + 1][0] != '-') {
-                status = parse_option(arg, argv[++i]);
+            if (i + 1 < argc_ && argv_[i + 1][0] != '-') {
+                status = parse_option(arg, argv_[++i]);
                 if (status != types::error_codes::no_error) return status;
             } else {
                 status = set_flag(arg);
@@ -149,7 +154,7 @@ types::error_codes argument_parser::parse() {
         } else {
             if (!process_id_set) {
                 DWORD process_id = 0;
-                std::istringstream iss(argv[i]);
+                std::istringstream iss(argv_[i]);
                 iss >> process_id;
                 if (!iss.fail() && process_id != 0) {
                     parsed_args_.process_id = process_id;
@@ -159,15 +164,15 @@ types::error_codes argument_parser::parse() {
                     continue;
                 }
 
-                auto processes = get_process_id_by_process_name(argv[i]);
+                auto processes = get_process_id_by_process_name(argv_[i]);
                 if (processes.size()) {
-                    parsed_args_.process_name = argv[i];
+                    parsed_args_.process_name = argv_[i];
                     parsed_args_.process_id = select_process(processes);
 
                     process_id_set = true;
                 }
-            } if (!payload_path_set && std::filesystem::exists(argv[i])) {
-                parsed_args_.payload_path = argv[i];
+            } if (!payload_path_set && std::filesystem::exists(argv_[i])) {
+                parsed_args_.payload_path = argv_[i];
                 parsed_args_.relative_payload_path = path_to_string(parsed_args_.payload_path);
 
                 payload_path_set = true;
@@ -196,12 +201,13 @@ void argument_parser::usage(const std::string error_message) const {
         "  target_process.exe, path/to/payload\n"
         "\n"
         "optional arguments:\n"
-        "  -i\t\tspecify injection method\n"
-        "  -S,--stealth\tspecify stealth level\n"
-        "  -s,--silent\tsuppress output\n"
-        "  -o,--output\tspecify output log file\n"
-        "  -d\t\tadd delay to the injection (milliseconds)\n"
-        "  -v,-vv\t\tset verbosity level\n"
+        "  -i               specify injection method\n"
+        "  -d               add delay to the injection (milliseconds)\n"
+        "  -s,-ss\n"
+        "  --stealth=N      set stealth level 0-2\n"
+        "  -v,-vv,\n"
+        "  --verbosity=N    set verbosity level 0-2\n"
+        "  -o,--output-file specify output log file (verbose level 2)\n"
         "\n"
         "example:\n"
         "  %s calc.exe ./payload.dll -i LoadLibraryA -d 2000\n"
@@ -228,6 +234,8 @@ types::error_codes argument_parser::parse_option(const std::string& option, cons
         }
 
         parsed_args_.delay = std::chrono::milliseconds{delay_raw};
+    } else if (option == "-o") {
+        parsed_args_.log_path = value;
     } else {
         usage("Unknown option " + option);
     }
@@ -235,13 +243,13 @@ types::error_codes argument_parser::parse_option(const std::string& option, cons
 }
 
 types::error_codes argument_parser::set_flag(const std::string& flag) {
-    if (flag == "-S" || flag == "--stealth") {
+    if (flag == "-s" || flag == "--stealth=1") {
         parsed_args_.stealth = 1;
-    } else if (flag == "-s" || flag == "--silent") {
-        parsed_args_.silent = true;
-    } else if (flag == "-v") {
+    } else if (flag == "-ss" || flag == "--stealth=2") {
+        parsed_args_.stealth = 2;
+    } else if (flag == "-v" || flag == "--verbosity=1") {
         parsed_args_.verbosity = 1;
-    } else if (flag == "-vv") {
+    } else if (flag == "-vv" || flag == "--verbosity=2") {
         parsed_args_.verbosity = 2;
     } else {
         usage("Unsupported flag " + flag);

@@ -1,7 +1,6 @@
 #include "util.hpp"
 
 #include "definitions.hpp"
-#include "pe32.hpp"
 
 #include <tlhelp32.h>
 
@@ -51,14 +50,14 @@ std::string get_process_name_by_process_id(DWORD process_id) {
 }
 
 int get_architecture(const HANDLE process_handle) {
-    unsigned short host_machine;
-    unsigned short process_machine;
+    unsigned short host_machine = 0;
+    unsigned short process_machine = 0;
 
     IsWow64Process2_t fIsWow64Process2 = (IsWow64Process2_t)GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process2");
     if (!fIsWow64Process2)
     {
         fprintf(stderr, "Failed to load IsWow64Process2\n");
-        return -1;
+        return types::machine::type_err;
     }
     else
     {
@@ -68,19 +67,19 @@ int get_architecture(const HANDLE process_handle) {
     if (!fIsWow64Process2(process_handle, &process_machine, &host_machine))
     {
         fprintf(stderr, "Failed to detect architecture\n");
-        return types::machine_type_err;
+        return types::machine::type_err;
     }
 
     if ((process_machine) & IMAGE_FILE_32BIT_MACHINE)
     {
         fprintf(stdout, "PE32 detected\n");
-        return types::machine_x86;
+        return types::machine::x86;
     }
     else
     {
         fprintf(stdout, "PE32+ detected\n");
-        return types::machine_x64;
+        return types::machine::x64;
     }
 
-    return types::machine_unknown;
+    return types::machine::unknown;
 }

@@ -1,12 +1,12 @@
 #include "logger.hpp"
 #include "util.hpp"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 
-int log_basic(const types::injector& inj, const char* event, std::uint32_t shiftwidth) {
-    (void)inj;
+std::int32_t log_basic(const types::parsed_args_t& args, const char* event, std::uint32_t shiftwidth) {
+    (void)args;
     int bytes_written = 0;
 
     time_t rawtime = 0;
@@ -24,10 +24,17 @@ int log_basic(const types::injector& inj, const char* event, std::uint32_t shift
     return bytes_written;
 }
 
-int log_advanced(const types::injector& inj, const char* event, std::uint32_t shiftwidth) {
-    int bytesWritten        = 0;
-    int verbosity           = inj.verbosity;
-    const char* output_file = inj.output_file.data();
+std::int32_t log_advanced(const types::parsed_args_t& args, const char* event, std::uint32_t shiftwidth) {
+    int bytesWritten = 0;
+    int verbosity = args.verbosity;
+    char output_file[MAX_PATH]{ 0 };
+    [&args, &output_file]() -> auto {
+        const std::string& path_wstr = args.log_path.string();
+        std::size_t str_size = path_wstr.size();
+        for (std::size_t i = 0; i < str_size; ++i) {
+            output_file[i] = static_cast<char>(path_wstr[i] & 0xFF);
+        }
+    }();
 
     FILE* fp = nullptr;
     if (!file_exists(output_file)) {

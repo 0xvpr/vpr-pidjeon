@@ -14,7 +14,7 @@ std::int32_t log_basic(const types::parsed_args_t& args, const char* event, std:
     struct tm* info = nullptr;
 
     time(&rawtime);
-    info = localtime(&rawtime);
+    localtime_s(info, &rawtime);
 
     char prefix[64] = { 0 };
     strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
@@ -26,8 +26,8 @@ std::int32_t log_basic(const types::parsed_args_t& args, const char* event, std:
 }
 
 std::int32_t log_advanced(const types::parsed_args_t& args, const char* event, std::uint32_t shiftwidth) {
-    int bytesWritten = 0;
-    int verbosity = args.verbosity;
+    int bytes_written = 0;
+
     char output_file[MAX_PATH]{ 0 };
     [&args, &output_file]() -> auto {
         const std::string& path_wstr = args.log_path.string();
@@ -38,50 +38,35 @@ std::int32_t log_advanced(const types::parsed_args_t& args, const char* event, s
     }();
 
     FILE* fp = nullptr;
-    if (!std::filesystem::exists(output_file)) {
-        if ((fp = fopen(output_file, "wb"))) {
-            time_t rawtime = 0;
-            struct tm* info = nullptr;
-
-            time(&rawtime);
-            info = localtime(&rawtime);
-
-            char prefix[64] = { 0 };
-            strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
-            
-            while (shiftwidth--) fputc(' ', fp);
-            bytesWritten += fprintf(fp, "%s Log file created.\n", prefix);
-            fclose(fp);
-        }
-        else {
-            if (verbosity > 2) {
-                fprintf(stderr, "Error while opening '%s'.", output_file);
-            }
-
-            return -1;
-        }
-    }
-
-    if ((fp = fopen(output_file, "ab"))) {
+    if ( !std::filesystem::exists(output_file) &&
+        (!fopen_s(&fp, output_file, "wb")) )
+    {
         time_t rawtime = 0;
         struct tm* info = nullptr;
 
         time(&rawtime);
-        info = localtime(&rawtime);
+        localtime_s(info, &rawtime);
 
         char prefix[64] = { 0 };
         strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
         
         while (shiftwidth--) fputc(' ', fp);
-        bytesWritten += fprintf(fp, "%s %s.\n", prefix, event);
+        bytes_written += fprintf(fp, "%s Log file created.\n", prefix);
         fclose(fp);
-    } else {
-        if (verbosity > 1) {
-            fprintf(stderr, "Error while opening '%s'.", output_file);
-        }
+    } else if (!fopen_s(&fp, output_file, "ab")) {
+        time_t rawtime = 0;
+        struct tm* info = nullptr;
 
-        return -1;
-    }
+        time(&rawtime);
+        localtime_s(info, &rawtime);
 
-    return bytesWritten;
+        char prefix[64] = { 0 };
+        strftime(prefix, 80, "[%Y-%m-%d %H:%M:%S]:", info);
+        
+        while (shiftwidth--) fputc(' ', fp);
+        bytes_written += fprintf(fp, "%s %s.\n", prefix, event);
+        fclose(fp);
+    } 
+
+    return bytes_written;
 }

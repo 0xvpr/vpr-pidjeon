@@ -2,14 +2,12 @@
 #include "logger.hpp"
 #include "util.hpp"
 
-#include <windows.h>
-
 #include <filesystem>
 
 std::int32_t load_library_a(const types::parsed_args_t& args) {
-    HANDLE process_handle = nullptr;
-    if (!args.process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id))) )
-    {
+    HANDLE process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id);
+
+    if (!args.process_id || !process_handle) {
         LOG_MSG(args, "Failed to open process", 0);
         return inject::process_not_running;
     }
@@ -65,9 +63,9 @@ std::int32_t load_library_a(const types::parsed_args_t& args) {
 }
 
 std::int32_t load_library_w(const types::parsed_args_t& args) {
-    HANDLE process_handle = nullptr;
-    if (!args.process_id || !((process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id))) )
-    {
+    HANDLE process_handle = OpenProcess(PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id);
+
+    if (!args.process_id || !process_handle) {
         LOG_MSG(args, "Failed to open process", 0);
         return inject::process_not_running;
     }

@@ -89,8 +89,9 @@ DWORD library_loader(LPVOID memory) {
 }
 
 static
-std::int32_t __declspec(naked) __stdcall stub()
+std::int32_t __stdcall stub()
 {
+    return 0;
 }
 
 std::int32_t inject_manual_map(const types::parsed_args_t& args) {

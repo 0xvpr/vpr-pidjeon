@@ -8,10 +8,12 @@ ifeq ($(VERBOSE),1)
 VERBOSE             = --verbose
 endif
 
+ifeq ($(CMAKE),)
 CMAKE               = cmake
+endif
+
 CMAKE_SOURCES      := $(shell find . -name "CMakeLists.txt")
 CMAKE_TOOLCHAIN    := $(addprefix ./,mingw-toolchain.cmake)
-
 
 SOURCE_DIR          = src
 OBJECT_DIR          = build

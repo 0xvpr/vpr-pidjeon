@@ -1,12 +1,25 @@
 # TODO
-- [ ] Add some sort of Jira for project management
-- [ ] Improve DLL injection statuses
-- [ ] Improve DLL injection verification
-- [ ] Add an automatic updating feature
-- [ ] Add a configuration that is generated each run and is located in the %AppData% or some local home folder.
-- [ ] SWITCH: --cave -> (enhanced remote thread routine) code cave start address
-- [ ] SWITCH: -s --silent -> disable logging
+### Major
+- [ ] Add UI
 - [ ] SWITCH: -S --stealth -> specify stealth level
+  - [ ] Implement stealth 1 load_library_a
+  - [ ] Implement stealth 1 load_library_w
+  - [ ] Implement stealth 1 manual_map
+  - [ ] Implement stealth 1 create_remote_thread
+  - [ ] Implement stealth 2 load_library_a
+  - [ ] Implement stealth 2 load_library_w
+  - [ ] Implement stealth 2 manual_map
+  - [ ] Implement stealth 2 create_remote_thread
+- [ ] Add an automatic updating feature
+- [ ] Implement CLI Wrapper
+- [ ] Write Unit Tests
+
+### Minor
+- [ ] Improve parser
+  - [ ] Basically everything
+- [ ] Add install tasks
+- [ ] Improve DLL injection verification
+- [ ] Improve Machine verification
 
 # TODONE
 - [x] Use cmake build system inside of pidjeon

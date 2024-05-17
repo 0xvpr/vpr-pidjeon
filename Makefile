@@ -45,9 +45,10 @@ docker-build:
 
 .PHONY: clean
 clean:
-	rm -fr `find ./bin -name "*.exe"`
-	rm -fr `find ./lib -name "*.dll"`
-	rm -fr `find ./build -name "*.o"`
+	if [ -d bin ];   then rm -fr ./bin/*;   fi
+	if [ -d lib ];   then rm -fr ./lib/*;   fi 
+	if [ -d build ]; then rm -fr ./build/*; fi 
+
 .PHONY: extra-clean
 extra-clean:
 	rm -fr ./bin

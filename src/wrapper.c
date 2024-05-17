@@ -1,6 +1,6 @@
 #include "util.h"
 #include "mem.h"
-#include "util.hpp"
+#include "util.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 {
     PROCESS_INFORMATION pi = { 0 };
     STARTUPINFO         si = { 0 };
-    HANDLE              p = nullptr;
+    HANDLE              p = NULL;
     DWORD               pid = 0;
     BOOL                arch = 0;
     BOOL                rv = 0;
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
             return 2;
         }
 
-        GetModuleFileNameExA(p, nullptr, full_path, MAX_PATH);
+        GetModuleFileNameExA(p, NULL, full_path, MAX_PATH);
         CloseHandle(p);
         fprintf(stdout, "%s\n", full_path);
     }
@@ -86,14 +86,14 @@ int main(int argc, char** argv)
 
     si.cb = sizeof(si);
     rv = CreateProcess(
-        nullptr,        // No module name (use command line)
+        NULL,        // No module name (use command line)
         command,        // Command line
-        nullptr,        // Process handle not inheritable
-        nullptr,        // Thread handle not inheritable
+        NULL,        // Process handle not inheritable
+        NULL,        // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
         0,              // No creation flags
-        nullptr,        // Use parent's environment block
-        nullptr,        // Use parent's starting directory 
+        NULL,        // Use parent's environment block
+        NULL,        // Use parent's starting directory 
         &si,            // Pointer to STARTUPINFO structure
         &pi             // Pointer to PROCESS_INFORMATION structure
     );

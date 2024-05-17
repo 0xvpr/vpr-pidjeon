@@ -1,7 +1,7 @@
 #ifndef   MANUAL_MAP_HEADER
 #define   MANUAL_MAP_HEADER
 
-#include  "definitions.hpp"
+#include  "definitions.h"
 
 typedef FARPROC(__stdcall * pGetProcAddress)(HMODULE, LPCSTR);
 typedef INT(__stdcall * dllmain)(HMODULE, DWORD, LPVOID);
@@ -16,6 +16,6 @@ typedef struct _LoaderData {
 	pGetProcAddress fnGetProcAddress;
 } LoaderData;
 
-std::int32_t inject_manual_map(const types::parsed_args_t&);
+enum status_t manual_map(const struct parsed_args_t*);
 
 #endif // MANUAL_MAP_HEADER

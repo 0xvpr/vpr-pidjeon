@@ -1,11 +1,11 @@
-#include "manual_map.hpp"
+#include "inject/manual_map.h"
 
-#include "definitions.hpp"
-#include "logger.hpp"
-#include "util.hpp"
+#include "common/logger.h"
+#include "common/util.h"
 
 static
-DWORD library_loader(LPVOID memory) {
+DWORD library_loader(LPVOID memory)
+{
     LoaderData* LoaderParams = (LoaderData *)memory;
     PIMAGE_BASE_RELOCATION pIBR = LoaderParams->BaseReloc;
 
@@ -82,57 +82,59 @@ DWORD library_loader(LPVOID memory) {
     if (LoaderParams->NtHeaders->OptionalHeader.AddressOfEntryPoint)
     {
         dllmain EntryPoint = (dllmain)((LPBYTE)LoaderParams->ImageBase + LoaderParams->NtHeaders->OptionalHeader.AddressOfEntryPoint);
-        return (DWORD)EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, nullptr);
+        return (DWORD)EntryPoint((HMODULE)LoaderParams->ImageBase, DLL_PROCESS_ATTACH, NULL);
     }
 
     return TRUE;
 }
 
 static
-std::int32_t __declspec(naked) __stdcall stub()
+int32_t __stdcall stub()
 {
+    return 0;
 }
 
-std::int32_t inject_manual_map(const types::parsed_args_t& args) {
+enum status_t manual_map(const struct parsed_args_t* args)
+{
     LoaderData LoaderParams;
     TCHAR abs_payload_path[MAX_PATH];
 
-    GetFullPathName(args.relative_payload_path.data(), MAX_PATH, abs_payload_path, nullptr);
+    GetFullPathName(args->payload_path, MAX_PATH, abs_payload_path, NULL);
 
-    if ( !std::filesystem::exists(args.relative_payload_path) ||
-         !std::filesystem::exists(abs_payload_path))
+    if ( !file_exists(args->payload_path) ||
+         !file_exists(abs_payload_path))
     {
         LOG_MSG(args, "Payload path is invalid", 0);
-        return inject::dll_does_not_exist;
+        return status_dll_does_not_exist;
     }
 
-    HANDLE hFile = CreateFileA(abs_payload_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+    HANDLE hFile = CreateFileA(abs_payload_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
-    DWORD FileSize = GetFileSize(hFile, nullptr);
-    PVOID FileBuffer = VirtualAlloc(nullptr, FileSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    DWORD FileSize = GetFileSize(hFile, NULL);
+    PVOID FileBuffer = VirtualAlloc(NULL, FileSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    ReadFile(hFile, FileBuffer, FileSize, nullptr, nullptr);
+    ReadFile(hFile, FileBuffer, FileSize, NULL, NULL);
 
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)FileBuffer;
     PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)FileBuffer + pDosHeader->e_lfanew);
 
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, args.process_id);
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, args->process_id);
     
-    PVOID ExecutableImage = VirtualAllocEx(hProcess, nullptr, pNtHeaders->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    PVOID ExecutableImage = VirtualAllocEx(hProcess, NULL, pNtHeaders->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
     // Copy the headers to target process
-    WriteProcessMemory(hProcess, ExecutableImage, FileBuffer, pNtHeaders->OptionalHeader.SizeOfHeaders, nullptr);
+    WriteProcessMemory(hProcess, ExecutableImage, FileBuffer, pNtHeaders->OptionalHeader.SizeOfHeaders, NULL);
 
     // Target dll_full_path's Section Header & copy sections of the dll to the target
     PIMAGE_SECTION_HEADER pSectHeader = (PIMAGE_SECTION_HEADER)(pNtHeaders + 1);
     for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
     {
         WriteProcessMemory(hProcess, (PVOID)((LPBYTE)ExecutableImage + pSectHeader[i].VirtualAddress),
-            (PVOID)((LPBYTE)FileBuffer + pSectHeader[i].PointerToRawData), pSectHeader[i].SizeOfRawData, nullptr);
+            (PVOID)((LPBYTE)FileBuffer + pSectHeader[i].PointerToRawData), pSectHeader[i].SizeOfRawData, NULL);
     }
 
     // Allocating memory for the loader code.
-    PVOID LoaderMemory = VirtualAllocEx(hProcess, nullptr, 4096, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    PVOID LoaderMemory = VirtualAllocEx(hProcess, NULL, 4096, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
     LoaderParams.ImageBase = ExecutableImage;
     LoaderParams.NtHeaders = (PIMAGE_NT_HEADERS)((LPBYTE)ExecutableImage + pDosHeader->e_lfanew);
@@ -144,12 +146,12 @@ std::int32_t inject_manual_map(const types::parsed_args_t& args) {
     LoaderParams.fnGetProcAddress = GetProcAddress;
 
     // Write the loader information to target process 
-    WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(LoaderData), nullptr);
-    WriteProcessMemory(hProcess, (PVOID)((LoaderData*)LoaderMemory + 1), (LPCVOID)library_loader, (uintptr_t)stub - (uintptr_t)library_loader, nullptr);
+    WriteProcessMemory(hProcess, LoaderMemory, &LoaderParams, sizeof(LoaderData), NULL);
+    WriteProcessMemory(hProcess, (PVOID)((LoaderData*)LoaderMemory + 1), (LPCVOID)library_loader, (uintptr_t)stub - (uintptr_t)library_loader, NULL);
     
     
     // Create a remote thread to execute the loader code
-    HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)((LoaderData*)LoaderMemory + 1), LoaderMemory, 0, nullptr);
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((LoaderData*)LoaderMemory + 1), LoaderMemory, 0, NULL);
 
     // Wait for the loader to finish executing
     WaitForSingleObject(hThread, INFINITE);

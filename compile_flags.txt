@@ -1,7 +1,7 @@
 --target=x86_64-pc-windows-gnu
--std=c++20
--isystem/usr/lib/gcc/x86_64-w64-mingw32/10-win32/include/c++/
--isystem/usr/lib/gcc/x86_64-w64-mingw32/10-win32/include/c++/x86_64-w64-mingw32/
+-std=c99
+-isystem/usr/x86_64-w64-mingw32/include
+-Isrc
 -Wall
 -Wextra
 -Werror

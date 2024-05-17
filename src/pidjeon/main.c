@@ -8,9 +8,11 @@
  * Description: Payload injection tool.
 **/
 
-#include   "parser.h"
-#include   "logger.h"
-#include   "util.h"
+#include   "pidjeon/parser.h"
+#include   "common/logger.h"
+#include   "common/util.h"
+
+#include   "inject/loadlibrary.h"
 
 #include   <stdio.h>
 
@@ -81,6 +83,24 @@ int __handle_error(enum errcode_t err)
 
     return 0;
 }
+
+static inline
+void init_parsed_args(struct parsed_args_t* args, const char* argv0)
+{
+    args->process_id = 0;
+    args->verbosity = 0;
+    args->stealth = 0;
+    args->delay = 0;
+
+    strcpy(args->program_name, argv0);
+    memset(args->process_name, 0, sizeof(args->process_name));
+    memset(args->payload_path, 0, sizeof(args->payload_path));
+    strcpy(args->log_path, "%%APPDATA%%/log.txt");
+
+    args->logger = NULL;
+    args->operation = load_library_a;
+}
+
 
 int main(int argc, char** argv)
 {

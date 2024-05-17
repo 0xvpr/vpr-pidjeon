@@ -1,8 +1,7 @@
-#include "manual_map.h"
+#include "inject/manual_map.h"
 
-#include "definitions.h"
-#include "logger.h"
-#include "util.h"
+#include "common/logger.h"
+#include "common/util.h"
 
 static
 DWORD library_loader(LPVOID memory)

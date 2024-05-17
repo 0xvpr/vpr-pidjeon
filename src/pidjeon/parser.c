@@ -1,12 +1,12 @@
-#include "parser.h"
+#include "pidjeon/parser.h"
 
-#include "definitions.h"
-#include "logger.h"
-#include "util.h"
+#include "common/definitions.h"
+#include "common/logger.h"
+#include "common/util.h"
 
-#include "loadlibrary.h"
-#include "manual_map.h"
-#include "crt.h"
+#include "inject/loadlibrary.h"
+#include "inject/manual_map.h"
+#include "inject/crt.h"
 
 #include <windows.h>
 #include <conio.h>

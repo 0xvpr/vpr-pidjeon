@@ -1,7 +1,7 @@
 #ifndef   UTIL_HEADER
 #define   UTIL_HEADER
 
-#include  "definitions.h"
+#include  "common/definitions.h"
 
 void usage(const char* error_message, struct parsed_args_t* parsed_args);
 
@@ -12,8 +12,6 @@ int get_process_name_by_process_id(DWORD process_id, char* buffer, size_t buffer
 enum machine_t get_machine_type(const HANDLE process_handle);
 
 int file_exists(const char* filename);
-
-void init_parsed_args(struct parsed_args_t* parsed_args, const char* argv0);
 
 enum errcode_t validate_arguments(struct parsed_args_t* parsed_args);
 

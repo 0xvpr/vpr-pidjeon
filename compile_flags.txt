@@ -1,6 +1,7 @@
 --target=x86_64-pc-windows-gnu
 -std=c99
 -isystem/usr/x86_64-w64-mingw32/include
+-Isrc
 -Wall
 -Wextra
 -Werror

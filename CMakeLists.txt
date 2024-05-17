@@ -9,7 +9,9 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
 project( vpr-pidjeon )
 
 ## Main targets
-add_subdirectory( src )
+add_subdirectory( src/common )
+add_subdirectory( src/inject )
+add_subdirectory( src/pidjeon )
 
 ## Test targets
 #add_subdirectory( test )

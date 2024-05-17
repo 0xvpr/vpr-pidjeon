@@ -1,25 +1,23 @@
-cmake_minimum_required( VERSION 3.22.0 )
-
-## Initialize project
-project( vpr-pidjeon
+project( pidjeon
          VERSION        2.0.1
          LANGUAGES      C
 )
 
-set( SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
-set( INCLUDE_DIR ${SOURCE_DIR} )
-
-include_directories( ${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR}/src )
 
 add_executable(
     ${PROJECT_NAME}
          main.c
-         crt.c
-         loadlibrary.c
-         logger.c
-         manual_map.c
          parser.c
-         util.c
+)
+
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+        OUTPUT_NAME ${PROJECT_NAME}
+        PREFIX "vpr-"
+        SUFFIX "-${PROJECT_ARCHITECTURE}.exe"
 )
 
 target_compile_options(
@@ -58,15 +56,8 @@ target_compile_options(
 
 target_link_libraries(
     ${PROJECT_NAME}
+    PRIVATE
         psapi
-        #$<$<CXX_COMPILER_ID:GNU>:-static>
+        inject_static
+        common_static
 )
-
-set_target_properties(
-    ${PROJECT_NAME}
-    PROPERTIES
-        OUTPUT_NAME ${PROJECT_NAME}
-        PREFIX ""
-        SUFFIX "-${PROJECT_ARCHITECTURE}.exe"
-)
-

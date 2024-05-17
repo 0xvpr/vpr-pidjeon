@@ -1,11 +1,11 @@
-#include "util.h"
+#include "common/util.h"
 
-#include "definitions.h"
-#include "version.h"
+#include "common/definitions.h"
+#include "common/version.h"
 
-#include "loadlibrary.h"
-#include "manual_map.h"
-#include "crt.h"
+#include "inject/loadlibrary.h"
+#include "inject/manual_map.h"
+#include "inject/crt.h"
 
 #include <tlhelp32.h>
 
@@ -156,22 +156,6 @@ int file_exists(const char *filename)
     fclose(fp);
 
     return 1;
-}
-
-void init_parsed_args(struct parsed_args_t* args, const char* argv0)
-{
-    args->process_id = 0;
-    args->verbosity = 0;
-    args->stealth = 0;
-    args->delay = 0;
-
-    strcpy(args->program_name, argv0);
-    memset(args->process_name, 0, sizeof(args->process_name));
-    memset(args->payload_path, 0, sizeof(args->payload_path));
-    strcpy(args->log_path, "%%APPDATA%%/log.txt");
-
-    args->logger = NULL;
-    args->operation = load_library_a;
 }
 
 enum errcode_t validate_arguments(struct parsed_args_t* args)

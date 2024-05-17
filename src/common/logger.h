@@ -1,7 +1,7 @@
 #ifndef   LOGGER_HEADER
 #define   LOGGER_HEADER
 
-#include  "definitions.h"
+#include  "common/definitions.h"
 
 #ifndef   LOG_MSG
 #define   LOG_MSG(injector, msg, shiftwidth) \

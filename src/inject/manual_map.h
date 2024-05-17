@@ -1,7 +1,7 @@
 #ifndef   MANUAL_MAP_HEADER
 #define   MANUAL_MAP_HEADER
 
-#include  "definitions.h"
+#include  "common/definitions.h"
 
 typedef FARPROC(__stdcall * pGetProcAddress)(HMODULE, LPCSTR);
 typedef INT(__stdcall * dllmain)(HMODULE, DWORD, LPVOID);

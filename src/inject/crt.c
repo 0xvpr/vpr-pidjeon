@@ -1,11 +1,11 @@
-#include "crt.h"
+#include "inject/crt.h"
 
-#include "logger.h"
+#include "common/logger.h"
 
 #include <tlhelp32.h>
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static inline
 char* extract_bytes_from_file(const char* f, size_t* size) {

@@ -1,6 +1,7 @@
-#include "loadlibrary.h"
-#include "logger.h"
-#include "util.h"
+#include "inject/loadlibrary.h"
+
+#include "common/logger.h"
+#include "common/util.h"
 
 enum status_t load_library_a(const struct parsed_args_t* args)
 {
